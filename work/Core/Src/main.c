@@ -91,6 +91,7 @@ int main(void)
   while (1)
   {
 
+	  int k = 10;
 
 
     /* USER CODE END WHILE */
