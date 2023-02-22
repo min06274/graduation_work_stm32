@@ -26,6 +26,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#include <stdio.h>
 
 /* USER CODE END PTD */
 
@@ -41,14 +42,24 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 
-/* USER CODE BEGIN PV */
+UART_HandleTypeDef huart1;
+uint8_t RxBuffer;
 
+
+
+
+/* USER CODE BEGIN PV */
+int _write(int file,char * p, int len){
+	HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
+	return len;
+}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,12 +98,15 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  uint8_t value = 25;
   //hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
   //hx711_coef_set(&loadcell, 354.5); // read afer calibration
   //hx711_tare(&loadcell, 10);
+  uint8_t str[] = "Hello, World!\n\r";
+  HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,6 +114,10 @@ int main(void)
   while (1)
   {
 
+
+
+
+	  /*
 	  htim2.Instance->CCR1 = 20;
 	  HAL_Delay(3000);
 
@@ -110,7 +128,7 @@ int main(void)
 	  htim2.Instance->CCR1 = 120;
 	  HAL_Delay(3000);
 
-
+*/
 	  //HAL_Delay(500);
 	  //weight = hx711_weight(&loadcell, 10);
 
@@ -126,6 +144,22 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+	 if(huart -> Instance == huart1.Instance)
+	 {
+      	HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
+      	HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
+
+        htim2.Instance->CCR1 = RxBuffer;
+
+
+
+        HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+	 }
+}
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -224,6 +258,39 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 
