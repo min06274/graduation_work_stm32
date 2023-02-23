@@ -158,7 +158,7 @@ int main(void)
 		  weight = hx711_weight(&loadcell, 10);
 		  gram = weight-prev_weight;
 	  }
-	  if((gram!= 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
+	  if((gram> 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
 	  {
 		  gram = 0;
 	  }
