@@ -41,6 +41,8 @@ typedef struct
   
 }hx711_t;
 
+
+
 //####################################################################################################################
 
 void        hx711_init(hx711_t *hx711, GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin);

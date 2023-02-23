@@ -43,16 +43,17 @@
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
-uint8_t RxBuffer;
-
-
-
 
 /* USER CODE BEGIN PV */
 int _write(int file,char * p, int len){
 	HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
 	return len;
 }
+uint8_t RxBuffer;
+hx711_t loadcell;
+float weight;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,7 +67,21 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
 
+	 if(huart -> Instance == huart1.Instance)
+	 {
+      	HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
+      	HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
+
+        htim2.Instance->CCR1 = RxBuffer;
+
+
+
+        HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+	 }
+}
 /* USER CODE END 0 */
 
 /**
@@ -101,9 +116,9 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  //hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
-  //hx711_coef_set(&loadcell, 354.5); // read afer calibration
-  //hx711_tare(&loadcell, 10);
+  hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
+  hx711_coef_set(&loadcell, 354.5); // read afer calibration
+  hx711_tare(&loadcell, 10);
   uint8_t str[] = "Hello, World!\n\r";
   HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
@@ -114,6 +129,8 @@ int main(void)
   while (1)
   {
 
+	  HAL_Delay(500);
+	  weight = hx711_weight(&loadcell, 10);
 
 
 
@@ -144,22 +161,6 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-
-	 if(huart -> Instance == huart1.Instance)
-	 {
-      	HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
-      	HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
-
-        htim2.Instance->CCR1 = RxBuffer;
-
-
-
-        HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
-	 }
-}
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -309,17 +310,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin, GPIO_PIN_SET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(HX711_CLK_GPIO_Port, HX711_CLK_Pin, GPIO_PIN_SET);
-
-  /*Configure GPIO pin : GPIO_LED_Pin */
-  GPIO_InitStruct.Pin = GPIO_LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIO_LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HX711_DATA_Pin */
   GPIO_InitStruct.Pin = HX711_DATA_Pin;
