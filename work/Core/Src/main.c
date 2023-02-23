@@ -27,6 +27,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #include <stdio.h>
+#include <math.h>
 
 /* USER CODE END PTD */
 
@@ -55,7 +56,9 @@ int _write(int file,char * p, int len){
 uint8_t RxBuffer;
 hx711_t loadcell;
 float weight;
-
+float gram;
+float prev_weight;
+float first_weight;
 
 /* USER CODE END PV */
 
@@ -133,7 +136,9 @@ int main(void)
   uint8_t str[] = "Hello, World!\n\r";
   HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
-  int value = 0;
+  first_weight = hx711_weight(&loadcell, 10);
+  weight = hx711_weight(&loadcell, 10);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -142,8 +147,21 @@ int main(void)
   {
 
 
+
+	  prev_weight = weight;
+
+
 	  HAL_Delay(10);
-	  weight = hx711_weight(&loadcell, 10);
+	  if(abs((int)(hx711_weight(&loadcell, 10)-prev_weight)) > 1)
+	  {
+
+		  weight = hx711_weight(&loadcell, 10);
+		  gram = weight-prev_weight;
+	  }
+	  if((gram!= 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
+	  {
+		  gram = 0;
+	  }
 
 
 
