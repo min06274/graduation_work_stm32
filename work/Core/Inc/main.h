@@ -69,6 +69,14 @@ void Error_Handler(void);
 #define HX711_CLK_GPIO_Port GPIOA
 #define FND_SCLK_Pin GPIO_PIN_10
 #define FND_SCLK_GPIO_Port GPIOB
+#define IN4_Pin GPIO_PIN_7
+#define IN4_GPIO_Port GPIOD
+#define IN3_Pin GPIO_PIN_5
+#define IN3_GPIO_Port GPIOB
+#define IN2_Pin GPIO_PIN_7
+#define IN2_GPIO_Port GPIOB
+#define IN1_Pin GPIO_PIN_9
+#define IN1_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
