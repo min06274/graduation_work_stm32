@@ -173,7 +173,7 @@ void stepper_step_angle (float angle, int direction, int rpm)
 
   for (int seq=0; seq<numberofsequences; seq++)
   {
-    if (direction == 0)  // for clockwise
+    if (direction == 0)  // for anti- clockwise
     {
       for (int step=7; step>=0; step--)
       {
@@ -183,7 +183,7 @@ void stepper_step_angle (float angle, int direction, int rpm)
 
     }
 
-    else if (direction == 1)  // for anti-clockwise
+    else if (direction == 1)  // for clockwise
     {
       for (int step=0; step<8; step++)
       {
@@ -254,6 +254,11 @@ int main(void)
   {
 
 
+	  stepper_step_angle(180,1,13);
+
+
+	  HAL_Delay(1000);
+	  /*
 	  for(int i = 0; i<512; i++)
 	  {
 		  for(int j = 0; j<8; j++)
@@ -262,7 +267,7 @@ int main(void)
 			  stepper_set_rpm(5);
 		  }
 	  }
-
+*/
 /*
 	  prev_weight = weight;
 
