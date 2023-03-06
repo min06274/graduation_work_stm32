@@ -63,13 +63,13 @@ void printDefault(){
 
 }
 
-void printTemper(uint8_t temper)
+void printTemper(int temper)
 {
 	SSD1306_GotoXY(14, 38);
 	char temper_str[100] = "";
 	sprintf(temper_str,"%d",temper);
 
-	SSD1306_Puts(temper, &Font_11x18, 1);
+	SSD1306_Puts(temper_str, &Font_11x18, 1);
 
 
 	SSD1306_UpdateScreen();

@@ -5,7 +5,7 @@
 
 void opening();
 void printDefault();
-void printTemper(uint8_t temper);
+void printTemper(int temper);
 
 
 #endif

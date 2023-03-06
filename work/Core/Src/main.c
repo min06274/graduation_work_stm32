@@ -70,6 +70,8 @@ float gram;
 float prev_weight;
 float first_weight;
 
+int locate = 1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,7 +99,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
         htim2.Instance->CCR1 = RxBuffer;
 
-        printTemper(RxBuffer);
 
 
         HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
@@ -204,6 +205,80 @@ void stepper_step_angle (float angle, int direction, int rpm)
     }
   }
 }
+
+void six_step(int n)
+{
+    printTemper(n);
+
+	if(n != locate)
+	{
+
+
+	int temp =locate;
+	int cnt1 = 0; //clock-wise
+
+	int cnt2 = 0; //anti-clock-wise
+
+
+	//clock
+	for(int i = 1; i<=5; i++)
+		{
+			temp++;
+			cnt1++;
+
+			if(temp > 6)
+			{
+				temp = 1;
+			}
+			if(temp == n)
+			{
+				stepper_step_angle(60*cnt1,1,13);
+				locate = n;
+
+				return;
+			}
+			if(cnt1>=3)
+			{
+
+			    break;
+			}
+
+		}
+
+	//anti-clock
+	temp = locate;
+	for(int i = 1; i<=5; i++)
+		{
+			temp--;
+			cnt2++;
+
+			if(temp < 1)
+			{
+				temp = 6;
+			}
+			if(temp == n)
+			{
+				stepper_step_angle(60*cnt2,0,13);
+				locate = n;
+				return;
+			}
+			if(cnt2>=3)
+			{
+				stepper_step_angle(60*cnt2,0,13);
+				locate = n;
+				return;
+			}
+
+		}
+
+
+
+
+
+	}
+
+
+}
 /* USER CODE END 0 */
 
 /**
@@ -249,17 +324,17 @@ int main(void)
   //HAL_TIM_Base_Start_IT(&htim3);
 
   //servo
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
   /*
   hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
   hx711_coef_set(&loadcell, 354.5); // read afer calibration
   hx711_tare(&loadcell, 10);
   */
-  uint8_t str[] = "Hello, World!\n\r";
+  //uint8_t str[] = "Hello, World!\n\r";
 
   //uart_interrupt
-  HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+  //HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
   /*
   first_weight = hx711_weight(&loadcell, 10);
@@ -267,7 +342,7 @@ int main(void)
 */
 
   //using micro delay for step motor
-  //HAL_TIM_Base_Start(&htim4);
+  HAL_TIM_Base_Start(&htim4);
 
   //oled
   SSD1306_Init();
@@ -282,32 +357,34 @@ int main(void)
   {
 
 
-	  //0 degree
-      htim2.Instance->CCR1 = 20;
 
-	  HAL_Delay(4000);
-      htim2.Instance->CCR1 = 70;
-
-	  HAL_Delay(4000);
-
-      htim2.Instance->CCR1 = 120;
+	  six_step(1);
 
 	  HAL_Delay(4000);
 
 
-      htim2.Instance->CCR1 = 170;
+	  six_step(3);
+
+	  HAL_Delay(4000);
+
+	  six_step(2);
+
+	  HAL_Delay(4000);
+
+	  six_step(5);
 
 	  HAL_Delay(4000);
 
 	  //printTemper(++ccc);
 
 	  //HAL_Delay(3000);
+
 	  /*
 	  stepper_step_angle(180,1,13);
 
 
 	  HAL_Delay(1000);
-	  */
+*/
 	  /*
 	  for(int i = 0; i<512; i++)
 	  {
