@@ -28,6 +28,13 @@
 /* USER CODE BEGIN PTD */
 #include <stdio.h>
 #include <math.h>
+#include "fnd_controller.h"
+#include "fonts.h"
+#include "ssd1306.h"
+#include "test.h"
+#include "bitmap.h"
+#include "horse_anim.h"
+#include "OledController.h"
 
 /* USER CODE END PTD */
 
@@ -41,6 +48,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c2;
+
 SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim2;
@@ -71,6 +80,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,6 +97,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
         htim2.Instance->CCR1 = RxBuffer;
 
+        printTemper(RxBuffer);
 
 
         HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
@@ -203,12 +214,13 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	int ccc = 1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -228,24 +240,40 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-  /*
-  init_fnd(&hspi2);
 
-  HAL_TIM_Base_Start_IT(&htim3);
+  //init_fnd(&hspi2);
 
+  //fnd interrupt
+  //HAL_TIM_Base_Start_IT(&htim3);
+
+  //servo
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+  /*
   hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
   hx711_coef_set(&loadcell, 354.5); // read afer calibration
   hx711_tare(&loadcell, 10);
+  */
   uint8_t str[] = "Hello, World!\n\r";
+
+  //uart_interrupt
   HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
+  /*
   first_weight = hx711_weight(&loadcell, 10);
   weight = hx711_weight(&loadcell, 10);
 */
 
-  HAL_TIM_Base_Start(&htim4);
+  //using micro delay for step motor
+  //HAL_TIM_Base_Start(&htim4);
+
+  //oled
+  SSD1306_Init();
+
+
+  opening();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -254,10 +282,15 @@ int main(void)
   {
 
 
+	  //printTemper(++ccc);
+
+	  //HAL_Delay(3000);
+	  /*
 	  stepper_step_angle(180,1,13);
 
 
 	  HAL_Delay(1000);
+	  */
 	  /*
 	  for(int i = 0; i<512; i++)
 	  {
@@ -268,7 +301,8 @@ int main(void)
 		  }
 	  }
 */
-/*
+
+	  /*
 	  prev_weight = weight;
 
 
@@ -283,8 +317,8 @@ int main(void)
 	  {
 		  gram = 0;
 	  }
-*/
 
+*/
 
 
 	  //digit4_temper((int)(100));
@@ -357,6 +391,40 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.ClockSpeed = 400000;
+  hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
+
 }
 
 /**
