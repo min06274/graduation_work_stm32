@@ -282,6 +282,23 @@ int main(void)
   {
 
 
+	  //0 degree
+      htim2.Instance->CCR1 = 20;
+
+	  HAL_Delay(4000);
+      htim2.Instance->CCR1 = 70;
+
+	  HAL_Delay(4000);
+
+      htim2.Instance->CCR1 = 120;
+
+	  HAL_Delay(4000);
+
+
+      htim2.Instance->CCR1 = 170;
+
+	  HAL_Delay(4000);
+
 	  //printTemper(++ccc);
 
 	  //HAL_Delay(3000);
