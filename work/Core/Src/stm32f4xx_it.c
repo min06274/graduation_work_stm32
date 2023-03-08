@@ -231,6 +231,9 @@ void TIM3_IRQHandler(void)
 
 
 	digit4_temper((int)(gram*10));
+
+	  //digit4_temper((int)(100));
+
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */

@@ -326,17 +326,17 @@ int main(void)
   //servo
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
-  /*
+/*
   hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
   hx711_coef_set(&loadcell, 354.5); // read afer calibration
   hx711_tare(&loadcell, 10);
-  */
-  //uint8_t str[] = "Hello, World!\n\r";
 
+  uint8_t str[] = "Hello, World!\n\r";
+*/
   //uart_interrupt
   //HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
-  /*
+/*
   first_weight = hx711_weight(&loadcell, 10);
   weight = hx711_weight(&loadcell, 10);
 */
@@ -356,6 +356,29 @@ int main(void)
   while (1)
   {
 
+	  //digit4_temper((int)(100));
+
+
+
+
+	  /*
+		  prev_weight = weight;
+
+
+		  HAL_Delay(10);
+		  if(abs((int)(hx711_weight(&loadcell, 10)-prev_weight)) > 1)
+		  {
+
+			  weight = hx711_weight(&loadcell, 10);
+			  gram = weight-prev_weight;
+		  }
+		  if((gram> 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
+		  {
+			  gram = 0;
+		  }
+
+*/
+
 
 
 	  six_step(1);
@@ -363,7 +386,11 @@ int main(void)
 	  HAL_Delay(4000);
 
 
-	  six_step(3);
+	  six_step(2);
+
+	  HAL_Delay(4000);
+
+	  six_step(6);
 
 	  HAL_Delay(4000);
 
@@ -371,9 +398,10 @@ int main(void)
 
 	  HAL_Delay(4000);
 
-	  six_step(5);
+	  six_step(4);
 
 	  HAL_Delay(4000);
+
 
 	  //printTemper(++ccc);
 
@@ -396,26 +424,9 @@ int main(void)
 	  }
 */
 
-	  /*
-	  prev_weight = weight;
 
 
-	  HAL_Delay(10);
-	  if(abs((int)(hx711_weight(&loadcell, 10)-prev_weight)) > 1)
-	  {
 
-		  weight = hx711_weight(&loadcell, 10);
-		  gram = weight-prev_weight;
-	  }
-	  if((gram> 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
-	  {
-		  gram = 0;
-	  }
-
-*/
-
-
-	  //digit4_temper((int)(100));
 
 
 	  /*
