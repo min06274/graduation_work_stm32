@@ -69,6 +69,9 @@ float weight;
 float gram;
 float prev_weight;
 float first_weight;
+float calibration_factor = -200000;
+char uart_cali[10] = "";
+char senddata[20] = "";
 
 int locate = 1;
 
@@ -94,11 +97,56 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	 if(huart -> Instance == huart1.Instance)
 	 {
+		 switch(RxBuffer)
+		         {
+		           case '1':
+		             calibration_factor += 10;
+		             break;
+		           case '2':
+		             calibration_factor += 50;
+		             break;
+		           case '3':
+		             calibration_factor += 100;
+		             break;
+		           case '4':
+		             calibration_factor += 1000;
+		             break;
+
+		           case 'a':
+		             calibration_factor -= 10;
+		             break;
+		           case 's':
+		             calibration_factor -= 50;
+		             break;
+		           case 'd':
+		             calibration_factor -= 100;
+		             break;
+		           case 'f':
+		             calibration_factor -= 1000;
+		             break;
+		         }
+
+        sprintf(senddata,"%f",weight);
+
+	    HAL_UART_Transmit(&huart1,"Reading: ", strlen("Reading: "), 10);
+
+	    HAL_UART_Transmit(&huart1,senddata, strlen(senddata), 10);
+	    HAL_UART_Transmit(&huart1,"KG", strlen("KG"), 10);
+
+		 HAL_UART_Transmit(&huart1," calibration_factor", strlen(" calibration_factor"), 10);
+
+		 sprintf(uart_cali,"%f",calibration_factor);
+
+		 HAL_UART_Transmit(&huart1,uart_cali, strlen(uart_cali), 10);
+		 HAL_UART_Transmit(&huart1,"\n\n", strlen("\n\n"), 10);
+
+
+		 /*
       	HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
       	HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
 
         htim2.Instance->CCR1 = RxBuffer;
-
+*/
 
 
         HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
@@ -295,7 +343,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -326,15 +374,18 @@ int main(void)
   //servo
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
-/*
+
   hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
   hx711_coef_set(&loadcell, 354.5); // read afer calibration
-  hx711_tare(&loadcell, 10);
+  //hx711_tare(&loadcell, 10);
 
-  uint8_t str[] = "Hello, World!\n\r";
-*/
+
+
+
+  HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
+
   //uart_interrupt
-  //HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+  HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
 /*
   first_weight = hx711_weight(&loadcell, 10);
@@ -342,13 +393,15 @@ int main(void)
 */
 
   //using micro delay for step motor
-  HAL_TIM_Base_Start(&htim4);
+  //HAL_TIM_Base_Start(&htim4);
 
   //oled
-  SSD1306_Init();
+  //SSD1306_Init();
 
 
-  opening();
+  //opening();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -358,6 +411,18 @@ int main(void)
 
 	  //digit4_temper((int)(100));
 
+	  hx711_coef_set(&loadcell, calibration_factor); // read afer calibration
+	  hx711_tare(&loadcell, 10);
+
+
+
+
+    weight = hx711_weight(&loadcell, 10);
+
+
+
+
+    HAL_Delay(200);
 
 
 
@@ -380,7 +445,7 @@ int main(void)
 */
 
 
-
+/*
 	  six_step(1);
 
 	  HAL_Delay(4000);
@@ -401,7 +466,7 @@ int main(void)
 	  six_step(4);
 
 	  HAL_Delay(4000);
-
+*/
 
 	  //printTemper(++ccc);
 
@@ -772,7 +837,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(FND_RCLK_GPIO_Port, FND_RCLK_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(HX711_CLK_GPIO_Port, HX711_CLK_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, HX711_CLK_Pin|HX711_DATA_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
@@ -787,18 +852,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(FND_RCLK_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : HX711_DATA_Pin */
-  GPIO_InitStruct.Pin = HX711_DATA_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(HX711_DATA_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : HX711_CLK_Pin */
-  GPIO_InitStruct.Pin = HX711_CLK_Pin;
+  /*Configure GPIO pins : HX711_CLK_Pin HX711_DATA_Pin */
+  GPIO_InitStruct.Pin = HX711_CLK_Pin|HX711_DATA_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(HX711_CLK_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : IN4_Pin */
   GPIO_InitStruct.Pin = IN4_Pin;

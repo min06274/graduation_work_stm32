@@ -63,10 +63,10 @@ void Error_Handler(void);
 #define FND_RCLK_GPIO_Port GPIOC
 #define FND_DIO_Pin GPIO_PIN_3
 #define FND_DIO_GPIO_Port GPIOC
-#define HX711_DATA_Pin GPIO_PIN_2
-#define HX711_DATA_GPIO_Port GPIOA
 #define HX711_CLK_Pin GPIO_PIN_3
 #define HX711_CLK_GPIO_Port GPIOA
+#define HX711_DATA_Pin GPIO_PIN_4
+#define HX711_DATA_GPIO_Port GPIOA
 #define FND_SCLK_Pin GPIO_PIN_13
 #define FND_SCLK_GPIO_Port GPIOB
 #define IN4_Pin GPIO_PIN_7
