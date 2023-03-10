@@ -388,10 +388,10 @@ int main(void)
 
 
 
-
+/*
 	  weight = Get_Weight() - initial_weight;
 	  weight *=-1;
-
+*/
 	  weight_f = Get_Weight_f() - initial_weight_f;
 	  weight_f *=-1;
 

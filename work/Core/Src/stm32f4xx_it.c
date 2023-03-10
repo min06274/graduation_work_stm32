@@ -41,7 +41,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern weight;
+extern int32_t weight;
+extern float weight_f;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -225,7 +226,7 @@ void TIM3_IRQHandler(void)
 
 
 
-	digit4_temper((int)(weight));
+	digit4_temper((int)(weight_f*10));
 
 	  //digit4_temper((int)(100));
 

@@ -42,8 +42,8 @@ float Get_Weight_f()
 	HX711_Buffer = HX711_Read();
 	Weight_Shiwu = HX711_Buffer;
 	Weight_Shiwu = Weight_Shiwu - Weight_Maopi;
-	Weight_Shiwu = (int32_t)((float)Weight_Shiwu/GapValue);
-	f_weight = Weight_Shiwu/GapValue;
+
+	f_weight = (float)Weight_Shiwu/GapValue;
 
 	return f_weight;
 
