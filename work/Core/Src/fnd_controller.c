@@ -92,7 +92,7 @@ void digit4_show(int n, int replay, uint8_t showZero)
  }
 }
 
-static uint8_t m_tempercount = -1;
+static uint8_t m_tempercount = 0;
 void digit4_temper(int temper) {
 	int n1, n2, n3, n4;
 
@@ -128,7 +128,7 @@ void digit4_temper(int temper) {
 
 	if (temper > 999 && m_tempercount >= 4) {
 		m_tempercount = 0;
-	}else if(temper <= 99 && m_tempercount >= 3){
+	}else if(temper >99 && temper<1000 && m_tempercount >= 3){
 		m_tempercount = 0;
 	}else if(temper <= 99 && m_tempercount >= 2){
 		m_tempercount = 0;

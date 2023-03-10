@@ -74,6 +74,7 @@ int32_t weight = 0;
 int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -393,12 +394,9 @@ int main(void)
 	  weight *=-1;
 */
 	  weight_f = Get_Weight_f() - initial_weight_f;
-	  weight_f *=-1;
+	       weight_f *=-1;
 
-	  HAL_Delay(100);
-
-
-
+	       HAL_Delay(100);
 
 
 

@@ -226,6 +226,10 @@ void TIM3_IRQHandler(void)
 
 
 
+	if(weight_f<0)
+	{
+		weight_f = 0;
+	}
 	digit4_temper((int)(weight_f*10));
 
 	  //digit4_temper((int)(100));
