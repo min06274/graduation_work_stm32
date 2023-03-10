@@ -2,8 +2,9 @@
 #include "main.h"
 int32_t HX711_Buffer = 0;
 int32_t Weight_Maopi = 0,Weight_Shiwu = 0;
+float f_weight = 0;
 void delay_us (uint16_t us);
-#define GapValue 473
+#define GapValue 415
 
 //****************************************************
 //HX711 초기화
@@ -36,6 +37,17 @@ int32_t Get_Weight()
 	return Weight_Shiwu;
 }
 
+float Get_Weight_f()
+{
+	HX711_Buffer = HX711_Read();
+	Weight_Shiwu = HX711_Buffer;
+	Weight_Shiwu = Weight_Shiwu - Weight_Maopi;
+	Weight_Shiwu = (int32_t)((float)Weight_Shiwu/GapValue);
+	f_weight = Weight_Shiwu/GapValue;
+
+	return f_weight;
+
+}
 //****************************************************
 // HX711 읽기
 //****************************************************

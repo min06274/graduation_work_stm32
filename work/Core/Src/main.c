@@ -35,7 +35,7 @@
 #include "bitmap.h"
 #include "horse_anim.h"
 #include "OledController.h"
-
+#include "HX711.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -72,6 +72,8 @@ char senddata[20] = "";
 int locate = 1;
 int32_t weight = 0;
 int32_t initial_weight = 0;
+float weight_f = 0;
+float initial_weight_f = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -342,16 +344,14 @@ int main(void)
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 
-  //init_fnd(&hspi2);
+  init_fnd(&hspi2);
 
   //fnd interrupt
-  //HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim3);
 
   //servo
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
-
-  //hx711_tare(&loadcell, 10);
 
 
 
@@ -376,6 +376,7 @@ int main(void)
   HAL_TIM_Base_Start(&htim5);
   initial_weight = Get_Weight();
 
+  initial_weight_f = Get_Weight_f();
 
   /* USER CODE END 2 */
 
@@ -384,19 +385,17 @@ int main(void)
   while (1)
   {
 
-     //digit4_temper((int)(100));
-
-     //hx711_coef_set(&loadcell, calibration_factor); // read afer calibration
-     //hx711_tare(&loadcell, 10);
-
 
 
 
 
 	  weight = Get_Weight() - initial_weight;
 	  weight *=-1;
-	  HAL_Delay(100);
 
+	  weight_f = Get_Weight_f() - initial_weight_f;
+	  weight_f *=-1;
+
+	  HAL_Delay(100);
 
 
 

@@ -41,7 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+extern weight;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -221,16 +221,12 @@ void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
 
-/*
-
-	if(gram <0)
-	{
-		gram*= -1;
-	}
 
 
-	digit4_temper((int)(gram*10));
-*/
+
+
+	digit4_temper((int)(weight));
+
 	  //digit4_temper((int)(100));
 
   /* USER CODE END TIM3_IRQn 0 */
