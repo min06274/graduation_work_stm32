@@ -59,6 +59,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define HX711_SCK_Pin GPIO_PIN_4
+#define HX711_SCK_GPIO_Port GPIOE
+#define HX711_DT_Pin GPIO_PIN_5
+#define HX711_DT_GPIO_Port GPIOE
 #define FND_RCLK_Pin GPIO_PIN_2
 #define FND_RCLK_GPIO_Port GPIOC
 #define FND_DIO_Pin GPIO_PIN_3

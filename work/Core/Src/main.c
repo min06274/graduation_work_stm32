@@ -55,26 +55,23 @@ SPI_HandleTypeDef hspi2;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim5;
 
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 int _write(int file,char * p, int len){
-	HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
-	return len;
+   HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
+   return len;
 }
 uint8_t RxBuffer;
-hx711_t loadcell;
-float weight;
-float gram;
-float prev_weight;
-float first_weight;
-float calibration_factor = -200000;
+
 char uart_cali[10] = "";
 char senddata[20] = "";
 
 int locate = 1;
-
+int32_t weight = 0;
+int32_t initial_weight = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -86,6 +83,7 @@ static void MX_SPI2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_TIM5_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -95,135 +93,112 @@ static void MX_I2C2_Init(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
-	 if(huart -> Instance == huart1.Instance)
-	 {
-		 switch(RxBuffer)
-		         {
-		           case '1':
-		             calibration_factor += 10;
-		             break;
-		           case '2':
-		             calibration_factor += 50;
-		             break;
-		           case '3':
-		             calibration_factor += 100;
-		             break;
-		           case '4':
-		             calibration_factor += 1000;
-		             break;
+    if(huart -> Instance == huart1.Instance)
+    {
 
-		           case 'a':
-		             calibration_factor -= 10;
-		             break;
-		           case 's':
-		             calibration_factor -= 50;
-		             break;
-		           case 'd':
-		             calibration_factor -= 100;
-		             break;
-		           case 'f':
-		             calibration_factor -= 1000;
-		             break;
-		         }
 
         sprintf(senddata,"%f",weight);
 
-	    HAL_UART_Transmit(&huart1,"Reading: ", strlen("Reading: "), 10);
 
-	    HAL_UART_Transmit(&huart1,senddata, strlen(senddata), 10);
-	    HAL_UART_Transmit(&huart1,"KG", strlen("KG"), 10);
+       HAL_UART_Transmit(&huart1,"Reading: ", strlen("Reading: "), 10);
 
-		 HAL_UART_Transmit(&huart1," calibration_factor", strlen(" calibration_factor"), 10);
+       HAL_UART_Transmit(&huart1,senddata, strlen(senddata), 10);
+       HAL_UART_Transmit(&huart1,"KG", strlen("KG"), 10);
 
-		 sprintf(uart_cali,"%f",calibration_factor);
-
-		 HAL_UART_Transmit(&huart1,uart_cali, strlen(uart_cali), 10);
-		 HAL_UART_Transmit(&huart1,"\n\n", strlen("\n\n"), 10);
+       HAL_UART_Transmit(&huart1," calibration_factor", strlen(" calibration_factor"), 10);
 
 
-		 /*
-      	HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
-      	HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
+       HAL_UART_Transmit(&huart1,uart_cali, strlen(uart_cali), 10);
+       HAL_UART_Transmit(&huart1,"\n\n", strlen("\n\n"), 10);
+
+
+       /*
+         HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
+         HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
 
         htim2.Instance->CCR1 = RxBuffer;
 */
 
 
         HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
-	 }
+    }
 }
 
 #define stepsperrev 4096
 void micro_delay(uint16_t us)
 {
-	__HAL_TIM_SET_COUNTER(&htim4,0);
-	while(__HAL_TIM_GET_COUNTER(&htim4) < us);
+   __HAL_TIM_SET_COUNTER(&htim4,0);
+   while(__HAL_TIM_GET_COUNTER(&htim4) < us);
 }
-
+void delay_us (uint16_t us) //delay function
+{
+__HAL_TIM_SET_COUNTER(&htim5,0);  // setting the delay counter to 0.
+while (__HAL_TIM_GET_COUNTER(&htim5) < us);  // while loop till the counter reaches the delay given (us).
+}
 void stepper_set_rpm(int rpm)
 {
-	micro_delay(60000000/stepsperrev/rpm);
+   micro_delay(60000000/stepsperrev/rpm);
 }
 void stepper_half_drive(int step)
 {
-	switch(step){
-	case 0:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-		break;
+   switch(step){
+   case 0:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
+      break;
 
-	case 1:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-		break;
+   case 1:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
+      break;
 
 
-	case 2:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-		break;
+   case 2:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
+      break;
 
-	case 3:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-		break;
+   case 3:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
+      break;
 
-	case 4:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-		break;
+   case 4:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
+      break;
 
-	case 5:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-		break;
+   case 5:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
+      break;
 
-	case 6:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-		break;
+   case 6:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
+      break;
 
-	case 7:
-		HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-		break;
-	}
+   case 7:
+      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
+      break;
+   }
 }
 
 void stepper_step_angle (float angle, int direction, int rpm)
@@ -258,72 +233,72 @@ void six_step(int n)
 {
     printTemper(n);
 
-	if(n != locate)
-	{
+   if(n != locate)
+   {
 
 
-	int temp =locate;
-	int cnt1 = 0; //clock-wise
+   int temp =locate;
+   int cnt1 = 0; //clock-wise
 
-	int cnt2 = 0; //anti-clock-wise
-
-
-	//clock
-	for(int i = 1; i<=5; i++)
-		{
-			temp++;
-			cnt1++;
-
-			if(temp > 6)
-			{
-				temp = 1;
-			}
-			if(temp == n)
-			{
-				stepper_step_angle(60*cnt1,1,13);
-				locate = n;
-
-				return;
-			}
-			if(cnt1>=3)
-			{
-
-			    break;
-			}
-
-		}
-
-	//anti-clock
-	temp = locate;
-	for(int i = 1; i<=5; i++)
-		{
-			temp--;
-			cnt2++;
-
-			if(temp < 1)
-			{
-				temp = 6;
-			}
-			if(temp == n)
-			{
-				stepper_step_angle(60*cnt2,0,13);
-				locate = n;
-				return;
-			}
-			if(cnt2>=3)
-			{
-				stepper_step_angle(60*cnt2,0,13);
-				locate = n;
-				return;
-			}
-
-		}
+   int cnt2 = 0; //anti-clock-wise
 
 
+   //clock
+   for(int i = 1; i<=5; i++)
+      {
+         temp++;
+         cnt1++;
+
+         if(temp > 6)
+         {
+            temp = 1;
+         }
+         if(temp == n)
+         {
+            stepper_step_angle(60*cnt1,1,13);
+            locate = n;
+
+            return;
+         }
+         if(cnt1>=3)
+         {
+
+             break;
+         }
+
+      }
+
+   //anti-clock
+   temp = locate;
+   for(int i = 1; i<=5; i++)
+      {
+         temp--;
+         cnt2++;
+
+         if(temp < 1)
+         {
+            temp = 6;
+         }
+         if(temp == n)
+         {
+            stepper_step_angle(60*cnt2,0,13);
+            locate = n;
+            return;
+         }
+         if(cnt2>=3)
+         {
+            stepper_step_angle(60*cnt2,0,13);
+            locate = n;
+            return;
+         }
+
+      }
 
 
 
-	}
+
+
+   }
 
 
 }
@@ -337,7 +312,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-	int ccc = 1;
+   int ccc = 1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -364,6 +339,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_I2C2_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 
   //init_fnd(&hspi2);
@@ -375,22 +351,18 @@ int main(void)
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
 
-  hx711_init(&loadcell, HX711_CLK_GPIO_Port, HX711_CLK_Pin, HX711_DATA_GPIO_Port, HX711_DATA_Pin);
-  hx711_coef_set(&loadcell, 354.5); // read afer calibration
   //hx711_tare(&loadcell, 10);
 
 
 
 
-  HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
+  //HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
 
   //uart_interrupt
-  HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+  //HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
 
-/*
-  first_weight = hx711_weight(&loadcell, 10);
-  weight = hx711_weight(&loadcell, 10);
-*/
+
+
 
   //using micro delay for step motor
   //HAL_TIM_Base_Start(&htim4);
@@ -401,6 +373,9 @@ int main(void)
 
   //opening();
 
+  HAL_TIM_Base_Start(&htim5);
+  initial_weight = Get_Weight();
+
 
   /* USER CODE END 2 */
 
@@ -409,84 +384,67 @@ int main(void)
   while (1)
   {
 
-	  //digit4_temper((int)(100));
+     //digit4_temper((int)(100));
 
-	  hx711_coef_set(&loadcell, calibration_factor); // read afer calibration
-	  hx711_tare(&loadcell, 10);
-
-
-
-
-    weight = hx711_weight(&loadcell, 10);
+     //hx711_coef_set(&loadcell, calibration_factor); // read afer calibration
+     //hx711_tare(&loadcell, 10);
 
 
 
 
-    HAL_Delay(200);
+
+	  weight = Get_Weight() - initial_weight;
+	  weight *=-1;
+	  HAL_Delay(100);
 
 
 
-	  /*
-		  prev_weight = weight;
 
 
-		  HAL_Delay(10);
-		  if(abs((int)(hx711_weight(&loadcell, 10)-prev_weight)) > 1)
-		  {
-
-			  weight = hx711_weight(&loadcell, 10);
-			  gram = weight-prev_weight;
-		  }
-		  if((gram> 0) &&(first_weight-hx711_weight(&loadcell, 10) <1))
-		  {
-			  gram = 0;
-		  }
-
-*/
 
 
 /*
-	  six_step(1);
+     six_step(1);
 
-	  HAL_Delay(4000);
+     HAL_Delay(4000);
 
 
-	  six_step(2);
+     six_step(2);
 
-	  HAL_Delay(4000);
+     HAL_Delay(4000);
 
-	  six_step(6);
+     six_step(6);
 
-	  HAL_Delay(4000);
+     HAL_Delay(4000);
 
-	  six_step(2);
+     six_step(2);
 
-	  HAL_Delay(4000);
+     HAL_Delay(4000);
 
-	  six_step(4);
+     six_step(4);
 
-	  HAL_Delay(4000);
+     HAL_Delay(4000);
 */
 
-	  //printTemper(++ccc);
+     //printTemper(++ccc);
 
-	  //HAL_Delay(3000);
+     //HAL_Delay(3000);
 
-	  /*
-	  stepper_step_angle(180,1,13);
+     /*
+     stepper_step_angle(180,1,13);
 
 
-	  HAL_Delay(1000);
+     HAL_Delay(1000);
 */
-	  /*
-	  for(int i = 0; i<512; i++)
-	  {
-		  for(int j = 0; j<8; j++)
-		  {
-			  stepper_half_drive(j);
-			  stepper_set_rpm(5);
-		  }
-	  }
+     /*
+     for(int i = 0; i<512; i++)
+     {
+        for(int j = 0; j<8; j++)
+        {
+           stepper_half_drive(j);
+           stepper_set_rpm(5);
+        }
+     }
 */
 
 
@@ -494,20 +452,20 @@ int main(void)
 
 
 
-	  /*
-	  htim2.Instance->CCR1 = 20;
-	  HAL_Delay(3000);
+     /*
+     htim2.Instance->CCR1 = 20;
+     HAL_Delay(3000);
 
 
-	  htim2.Instance->CCR1 = 70;
-	  HAL_Delay(3000);
+     htim2.Instance->CCR1 = 70;
+     HAL_Delay(3000);
 
-	  htim2.Instance->CCR1 = 120;
-	  HAL_Delay(3000);
+     htim2.Instance->CCR1 = 120;
+     HAL_Delay(3000);
 
 */
-	  //HAL_Delay(500);
-	  //weight = hx711_weight(&loadcell, 10);
+     //HAL_Delay(500);
+     //weight = hx711_weight(&loadcell, 10);
 
 
     /* USER CODE END WHILE */
@@ -785,6 +743,51 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief TIM5 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM5_Init(void)
+{
+
+  /* USER CODE BEGIN TIM5_Init 0 */
+
+  /* USER CODE END TIM5_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM5_Init 1 */
+
+  /* USER CODE END TIM5_Init 1 */
+  htim5.Instance = TIM5;
+  htim5.Init.Prescaler = 80-1;
+  htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim5.Init.Period = 4294967295;
+  htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim5, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM5_Init 2 */
+
+  /* USER CODE END TIM5_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -827,11 +830,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(HX711_SCK_GPIO_Port, HX711_SCK_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(FND_RCLK_GPIO_Port, FND_RCLK_Pin, GPIO_PIN_SET);
@@ -844,6 +851,19 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, IN3_Pin|IN2_Pin|IN1_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin : HX711_SCK_Pin */
+  GPIO_InitStruct.Pin = HX711_SCK_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HX711_SCK_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : HX711_DT_Pin */
+  GPIO_InitStruct.Pin = HX711_DT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(HX711_DT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : FND_RCLK_Pin */
   GPIO_InitStruct.Pin = FND_RCLK_Pin;
