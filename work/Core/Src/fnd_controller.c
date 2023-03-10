@@ -128,7 +128,7 @@ void digit4_temper(int temper) {
 
 	if (temper > 999 && m_tempercount >= 4) {
 		m_tempercount = 0;
-	}else if(temper >99 && temper<1000 && m_tempercount >= 3){
+	}else if((temper >99 && temper<1000) && m_tempercount >= 3){
 		m_tempercount = 0;
 	}else if(temper <= 99 && m_tempercount >= 2){
 		m_tempercount = 0;
