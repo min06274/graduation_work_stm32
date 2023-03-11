@@ -58,6 +58,7 @@ TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim5;
 
 UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 int _write(int file,char * p, int len){
@@ -70,10 +71,17 @@ char uart_cali[10] = "";
 char senddata[20] = "";
 
 int locate = 1;
-int32_t weight = 0;
+int32_t weight = 1000;
 int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
+
+// bluetooth
+uint8_t rx3_data;
+uint8_t rx1_data;
+
+
+
 
 /* USER CODE END PV */
 
@@ -87,46 +95,54 @@ static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM5_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/*
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
     if(huart -> Instance == huart1.Instance)
     {
+    	sprintf(senddata,"%d",weight);
 
 
-        sprintf(senddata,"%f",weight);
+    	HAL_UART_Transmit(&huart1, senddata, strlen(senddata), 10);
 
 
-       HAL_UART_Transmit(&huart1,"Reading: ", strlen("Reading: "), 10);
+         //HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
+         //HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
 
-       HAL_UART_Transmit(&huart1,senddata, strlen(senddata), 10);
-       HAL_UART_Transmit(&huart1,"KG", strlen("KG"), 10);
-
-       HAL_UART_Transmit(&huart1," calibration_factor", strlen(" calibration_factor"), 10);
-
-
-       HAL_UART_Transmit(&huart1,uart_cali, strlen(uart_cali), 10);
-       HAL_UART_Transmit(&huart1,"\n\n", strlen("\n\n"), 10);
-
-
-       /*
-         HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
-         HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
-
-        htim2.Instance->CCR1 = RxBuffer;
-*/
+        //htim2.Instance->CCR1 = RxBuffer;
 
 
         HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
     }
 }
+*/
 
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+    if(huart -> Instance == USART1) //pc -> mobile
+    {
+    		HAL_UART_Transmit(&huart3, &rx1_data, sizeof(rx1_data), 10);
+            HAL_UART_Receive_IT(&huart1, &rx1_data, 1);
+
+    }
+    else if(huart->Instance == USART3) //mobile ->pc
+	{
+		HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
+        HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
+
+
+	}
+}
 #define stepsperrev 4096
 void micro_delay(uint16_t us)
 {
@@ -343,12 +359,13 @@ int main(void)
   MX_TIM4_Init();
   MX_I2C2_Init();
   MX_TIM5_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  init_fnd(&hspi2);
+  //init_fnd(&hspi2);
 
   //fnd interrupt
-  HAL_TIM_Base_Start_IT(&htim3);
+  //HAL_TIM_Base_Start_IT(&htim3);
 
   //servo
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
@@ -357,11 +374,12 @@ int main(void)
 
 
 
-  //HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
+  HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
 
   //uart_interrupt
-  //HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
+  HAL_UART_Receive_IT(&huart1, &rx1_data, sizeof(rx1_data));
 
+  HAL_UART_Receive_IT(&huart3, &rx3_data, sizeof(rx3_data));
 
 
 
@@ -374,11 +392,13 @@ int main(void)
 
   //opening();
 
+  //hx711 _msdelay
+  /*
   HAL_TIM_Base_Start(&htim5);
   initial_weight = Get_Weight();
 
   initial_weight_f = Get_Weight_f();
-
+*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -390,14 +410,11 @@ int main(void)
 
 
 /*
-	  weight = Get_Weight() - initial_weight;
-	  weight *=-1;
-*/
 	  weight_f = Get_Weight_f() - initial_weight_f;
 	       weight_f *=-1;
 
 	       HAL_Delay(100);
-
+*/
 
 
 /*
@@ -814,6 +831,39 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 9600;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 

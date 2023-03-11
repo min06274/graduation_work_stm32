@@ -110,7 +110,7 @@ void digit4_temper(int temper) {
 		send_port(_LED_0F[n2] & 0x7F, 0b0010); //1
 		break;
 	case 2:
-		if (temper > 99) {
+		if (temper > 99) { //3째짜리 부터는 값이 있어야 켜짐
 			send_port(_LED_0F[n3], 0b0100);
 		}
 		break;
