@@ -78,6 +78,8 @@ int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
 float uart_weight_f =0;
+float avg_weight_f = 0;
+
 
 // bluetooth uart
 uint8_t rx3_data;
@@ -205,7 +207,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-   int ccc = 1;
+   int cnt = 0;
+   float temp =0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -298,9 +301,25 @@ int main(void)
 
 
 
+
 	  weight_f = Get_Weight_f() - initial_weight_f;
 	       weight_f *=-1;
 
+	       weight_f = ceil(weight_f*10) / 10;
+
+	 	  temp += weight_f;
+
+	 	  cnt++;
+	 		  if(cnt == 15)
+	 		  {
+
+	 			  cnt = 0;
+	 			  avg_weight_f = temp/15;
+	 			  avg_weight_f = ceil(avg_weight_f*10)/10;
+
+
+	 			  temp = 0;
+	 		  }
 	       HAL_Delay(100);
 
 

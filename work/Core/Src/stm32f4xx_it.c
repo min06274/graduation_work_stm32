@@ -44,6 +44,7 @@
 extern int32_t weight;
 extern float weight_f;
 extern float uart_weight_f;
+extern float avg_weight_f;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
 /* USER CODE END PV */
@@ -230,13 +231,13 @@ void TIM3_IRQHandler(void)
 
 
 
-	if(weight_f<0)
+	if(avg_weight_f<0)
 	{
-		weight_f = 0;
+		avg_weight_f = 0;
 	}
 
 
-	if(weight_f > uart_weight_f)
+	if(avg_weight_f > uart_weight_f)
 	{
 		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 
@@ -246,7 +247,7 @@ void TIM3_IRQHandler(void)
 
 		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
 	}
-	digit4_temper((int)(weight_f*10));
+	digit4_temper((int)(avg_weight_f*10));
 
 	  //digit4_temper((int)(100));
 
