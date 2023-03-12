@@ -69,22 +69,22 @@ int _write(int file,char * p, int len){
    HAL_UART_Transmit(&huart1, (uint8_t *)p, len, 10);
    return len;
 }
-uint8_t RxBuffer;
 
 char uart_cali[10] = "";
-char senddata[20] = "";
+char senddata[20] = "zzz";
 
 int32_t weight = 1000;
 int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
+float uart_weight_f =0;
 
 // bluetooth uart
 uint8_t rx3_data;
 uint8_t rx1_data;
 
-char rx3_buffer[32];
-
+char Rx_buffer[100];
+int Rx_index = 0;
 
 
 
@@ -158,12 +158,29 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 
 
+    	  if(rx3_data != '\n')
+    	  {
+    		  Rx_buffer[Rx_index++] = rx3_data;
+    	  }
+    	  else
+    	  {
+    		  Rx_buffer[Rx_index] = '\0';
+    		  Rx_index = 0;
+
+    	      uart_weight_f = atof(Rx_buffer);
+
+
+
+
+    	  }
+
+    	  /*
         HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
     	//HAL_UART_Transmit(&huart1, rx3_buffer, strlen(rx3_buffer), 10);
 
         //startControll(rx3_data);
         //startControll(rx3_buffer);
-
+*/
 
 		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
 
