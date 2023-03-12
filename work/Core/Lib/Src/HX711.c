@@ -3,8 +3,10 @@
 int32_t HX711_Buffer = 0;
 int32_t Weight_Maopi = 0,Weight_Shiwu = 0;
 float f_weight = 0;
-void delay_us (uint16_t us);
 #define GapValue 415
+
+
+extern TIM_HandleTypeDef htim5;
 
 //****************************************************
 //HX711 초기화
@@ -16,6 +18,13 @@ void Init_Hx711()
 	pinMode(HX711_DT, INPUT);
 }
 */
+
+
+void delay_us (uint16_t us) //delay function
+{
+__HAL_TIM_SET_COUNTER(&htim5,0);  // setting the delay counter to 0.
+while (__HAL_TIM_GET_COUNTER(&htim5) < us);  // while loop till the counter reaches the delay given (us).
+}
 
 //****************************************************
 //펠트 무게 얻기

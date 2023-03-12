@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "hx711.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,6 +36,9 @@
 #include "horse_anim.h"
 #include "OledController.h"
 #include "HX711.h"
+#include "StepAngle.h"
+#include <stdlib.h>
+#include "StepController.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -71,15 +74,16 @@ uint8_t RxBuffer;
 char uart_cali[10] = "";
 char senddata[20] = "";
 
-int locate = 1;
 int32_t weight = 1000;
 int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
 
-// bluetooth
+// bluetooth uart
 uint8_t rx3_data;
 uint8_t rx1_data;
+
+char rx3_buffer[32];
 
 
 
@@ -141,190 +145,39 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     else if(huart->Instance == USART3) //mobile ->pc
 	{
 
-		HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
-        HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
+		//HAL_UART_Transmit(&huart1, "OK", strlen("OK"), 10);
+
+
+
+    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+
+    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
+
+    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+
+
+        HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
+    	//HAL_UART_Transmit(&huart1, rx3_buffer, strlen(rx3_buffer), 10);
+
+        //startControll(rx3_data);
+        //startControll(rx3_buffer);
+
+
+		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
+
+		//HAL_UART_Receive_IT(&huart3, rx3_buffer, strlen(rx3_buffer));
 
 
 	}
 }
-#define stepsperrev 4096
-void micro_delay(uint16_t us)
-{
-   __HAL_TIM_SET_COUNTER(&htim4,0);
-   while(__HAL_TIM_GET_COUNTER(&htim4) < us);
-}
-void delay_us (uint16_t us) //delay function
-{
-__HAL_TIM_SET_COUNTER(&htim5,0);  // setting the delay counter to 0.
-while (__HAL_TIM_GET_COUNTER(&htim5) < us);  // while loop till the counter reaches the delay given (us).
-}
-void stepper_set_rpm(int rpm)
-{
-   micro_delay(60000000/stepsperrev/rpm);
-}
-void stepper_half_drive(int step)
-{
-   switch(step){
-   case 0:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-      break;
-
-   case 1:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-      break;
-
-
-   case 2:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-      break;
-
-   case 3:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-      break;
-
-   case 4:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_RESET);
-      break;
-
-   case 5:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-      break;
-
-   case 6:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-      break;
-
-   case 7:
-      HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, GPIO_PIN_SET);
-      break;
-   }
-}
-
-void stepper_step_angle (float angle, int direction, int rpm)
-{
-  float anglepersequence = 0.703125;  // 360 = 512 sequences
-  int numberofsequences = (int) (angle/anglepersequence);
-
-  for (int seq=0; seq<numberofsequences; seq++)
-  {
-    if (direction == 0)  // for anti- clockwise
-    {
-      for (int step=7; step>=0; step--)
-      {
-        stepper_half_drive(step);
-        stepper_set_rpm(rpm);
-      }
-
-    }
-
-    else if (direction == 1)  // for clockwise
-    {
-      for (int step=0; step<8; step++)
-      {
-        stepper_half_drive(step);
-        stepper_set_rpm(rpm);
-      }
-    }
-  }
-}
-
-void six_step(int n)
-{
-    printTemper(n);
-
-   if(n != locate)
-   {
-
-
-   int temp =locate;
-   int cnt1 = 0; //clock-wise
-
-   int cnt2 = 0; //anti-clock-wise
-
-
-   //clock
-   for(int i = 1; i<=5; i++)
-      {
-         temp++;
-         cnt1++;
-
-         if(temp > 6)
-         {
-            temp = 1;
-         }
-         if(temp == n)
-         {
-            stepper_step_angle(60*cnt1,1,13);
-            locate = n;
-
-            return;
-         }
-         if(cnt1>=3)
-         {
-
-             break;
-         }
-
-      }
-
-   //anti-clock
-   temp = locate;
-   for(int i = 1; i<=5; i++)
-      {
-         temp--;
-         cnt2++;
-
-         if(temp < 1)
-         {
-            temp = 6;
-         }
-         if(temp == n)
-         {
-            stepper_step_angle(60*cnt2,0,13);
-            locate = n;
-            return;
-         }
-         if(cnt2>=3)
-         {
-            stepper_step_angle(60*cnt2,0,13);
-            locate = n;
-            return;
-         }
-
-      }
 
 
 
 
 
-   }
 
-
-}
 /* USER CODE END 0 */
 
 /**
@@ -367,6 +220,8 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
+  //step
+  /*
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
@@ -374,8 +229,9 @@ int main(void)
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+*/
 
-
+  //fnd
   init_fnd(&hspi2);
 
   //fnd interrupt
@@ -385,15 +241,16 @@ int main(void)
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
 
-
-
-
+  //uart first display
   HAL_UART_Transmit(&huart1,"Hello World!\r\n", strlen("Hello World!\r\n"), 10);
 
   //uart_interrupt
   HAL_UART_Receive_IT(&huart1, &rx1_data, sizeof(rx1_data));
 
+  //bluetooth
+
   HAL_UART_Receive_IT(&huart3, &rx3_data, sizeof(rx3_data));
+  //HAL_UART_Receive_IT(&huart3, rx3_buffer, strlen(rx3_buffer));
 
 
 
@@ -407,8 +264,9 @@ int main(void)
   //opening();
 
   //hx711 _msdelay
-
   HAL_TIM_Base_Start(&htim5);
+
+
   initial_weight = Get_Weight();
 
   initial_weight_f = Get_Weight_f();
@@ -423,7 +281,6 @@ int main(void)
 
 
 
-
 	  weight_f = Get_Weight_f() - initial_weight_f;
 	       weight_f *=-1;
 
@@ -431,69 +288,10 @@ int main(void)
 
 
 
-/*
-     six_step(1);
-
-     HAL_Delay(4000);
-
-
-     six_step(2);
-
-     HAL_Delay(4000);
-
-     six_step(6);
-
-     HAL_Delay(4000);
-
-     six_step(2);
-
-     HAL_Delay(4000);
-
-     six_step(4);
-
-     HAL_Delay(4000);
-*/
-
-     //printTemper(++ccc);
-
-     //HAL_Delay(3000);
-
-     /*
-     stepper_step_angle(180,1,13);
-
-
-     HAL_Delay(1000);
-*/
-     /*
-     for(int i = 0; i<512; i++)
-     {
-        for(int j = 0; j<8; j++)
-        {
-           stepper_half_drive(j);
-           stepper_set_rpm(5);
-        }
-     }
-*/
 
 
 
 
-
-
-     /*
-     htim2.Instance->CCR1 = 20;
-     HAL_Delay(3000);
-
-
-     htim2.Instance->CCR1 = 70;
-     HAL_Delay(3000);
-
-     htim2.Instance->CCR1 = 120;
-     HAL_Delay(3000);
-
-*/
-     //HAL_Delay(500);
-     //weight = hx711_weight(&loadcell, 10);
 
 
     /* USER CODE END WHILE */

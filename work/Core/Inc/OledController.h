@@ -7,5 +7,4 @@ void opening();
 void printDefault();
 void printTemper(int temper);
 
-
 #endif

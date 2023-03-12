@@ -6,5 +6,6 @@ extern uint32_t HX711_Read(void);
 extern int32_t Get_Weight();
 extern float Get_Weight_f();
 extern void Get_Maopi();
+void delay_us (uint16_t us);
 
 #endif

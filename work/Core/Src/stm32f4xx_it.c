@@ -43,6 +43,9 @@
 /* USER CODE BEGIN PV */
 extern int32_t weight;
 extern float weight_f;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim8;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -230,6 +233,18 @@ void TIM3_IRQHandler(void)
 	if(weight_f<0)
 	{
 		weight_f = 0;
+	}
+
+
+	if(weight_f > 10)
+	{
+		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+
+		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+
+		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
+
+		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
 	}
 	digit4_temper((int)(weight_f*10));
 
