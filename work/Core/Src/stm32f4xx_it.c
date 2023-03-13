@@ -229,7 +229,7 @@ void TIM3_IRQHandler(void)
 
 
 
-
+/*
 
 	if(avg_weight_f<0)
 	{
@@ -248,8 +248,26 @@ void TIM3_IRQHandler(void)
 		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
 	}
 	digit4_temper((int)(avg_weight_f*10));
-
+*/
 	  //digit4_temper((int)(100));
+
+	if(weight < 0)
+	{
+		weight = 0;
+	}
+
+	if(weight > uart_weight_f)
+	{
+		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+
+		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+
+		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
+
+		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+	}
+
+	digit4_temper(weight*10);
 
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);

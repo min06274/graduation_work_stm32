@@ -79,7 +79,7 @@ float weight_f = 0;
 float initial_weight_f = 0;
 float uart_weight_f =0;
 float avg_weight_f = 0;
-
+int hx_flag = 0;
 
 // bluetooth uart
 uint8_t rx3_data;
@@ -171,10 +171,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     	      uart_weight_f = atof(Rx_buffer);
 
-
-
+    	      hx_flag = 1;
 
     	  }
+
+
 
     	  /*
         HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
@@ -209,6 +210,8 @@ int main(void)
 
    int cnt = 0;
    float temp =0;
+   int idx = 0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -278,10 +281,10 @@ int main(void)
   //HAL_TIM_Base_Start(&htim4);
 
   //oled
-  //SSD1306_Init();
+  SSD1306_Init();
 
 
-  //opening();
+  printDefault();
 
   //hx711 _msdelay
   HAL_TIM_Base_Start(&htim5);
@@ -298,37 +301,60 @@ int main(void)
   while (1)
   {
 
+	  weight = Get_Weight()- initial_weight;
+	  weight *= -1;
+      HAL_Delay(100);
 
 
+      if((weight > uart_weight_f/15*idx) && hx_flag ==1)
+      {
+    	  opening(idx);
+    	  idx++;
+    	  if(idx > 15)
+    	  {
+    		  idx=0;
+    		  hx_flag=0;
+    	  }
+      }
 
+/*
 
 	  weight_f = Get_Weight_f() - initial_weight_f;
-	       weight_f *=-1;
+	  weight_f *=-1;
 
-	       weight_f = ceil(weight_f*10) / 10;
+	  weight_f = ceil(weight_f*10) / 10;
 
-	 	  temp += weight_f;
+	  temp += weight_f;
 
 	 	  cnt++;
-	 		  if(cnt == 15)
+	 		  if(cnt == 10)
 	 		  {
 
 	 			  cnt = 0;
-	 			  avg_weight_f = temp/15;
+	 			  avg_weight_f = temp/10;
 	 			  avg_weight_f = ceil(avg_weight_f*10)/10;
 
 
+	 			  if((avg_weight_f > uart_weight_f/15*idx) && hx_flag == 1)
+	 			 	{
+
+	 			 		  opening(idx);
+	 			 		  idx++;
+
+	 			    }
+	 			 	if (idx >15)
+	 			 	 {
+	 			 	  idx = 1;
+	 			 	  hx_flag = 0;
+	 			 	  }
+
 	 			  temp = 0;
 	 		  }
+
+
 	       HAL_Delay(100);
 
-
-
-
-
-
-
-
+	       */
 
     /* USER CODE END WHILE */
 

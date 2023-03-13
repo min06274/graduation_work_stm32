@@ -3,8 +3,9 @@
 #include "ssd1306.h"
 
 
-void opening();
+void opening(int idx);
 void printDefault();
 void printTemper(int temper);
+
 
 #endif
