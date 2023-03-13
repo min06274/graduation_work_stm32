@@ -47,6 +47,9 @@ extern float uart_weight_f;
 extern float avg_weight_f;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
+
+extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -265,6 +268,14 @@ void TIM3_IRQHandler(void)
 		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
 
 		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+
+		  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+
+		  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+
+		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+
+		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 	}
 
 	digit4_temper(weight*10);
