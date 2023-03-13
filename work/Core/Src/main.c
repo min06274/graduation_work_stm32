@@ -74,7 +74,7 @@ int _write(int file,char * p, int len){
 char uart_cali[10] = "";
 char senddata[20] = "zzz";
 
-int32_t weight = 1000;
+int32_t weight = 0;
 int32_t initial_weight = 0;
 float weight_f = 0;
 float initial_weight_f = 0;
@@ -82,6 +82,10 @@ float uart_weight_f =0;
 float avg_weight_f = 0;
 int hx_flag = 0;
 int uart_cnt = 0;
+int print_flag = 0;
+int salt_weight = 0;
+int sugar_weight = 0;
+
 
 // bluetooth uart
 uint8_t rx3_data;
@@ -138,6 +142,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 */
 
 
+/*
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
@@ -152,10 +157,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 
 		//HAL_UART_Transmit(&huart1, "OK", strlen("OK"), 10);
-
-
-
-
 
 
 
@@ -209,13 +210,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 
-    	  /*
+
         HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
     	//HAL_UART_Transmit(&huart1, rx3_buffer, strlen(rx3_buffer), 10);
 
         //startControll(rx3_data);
         //startControll(rx3_buffer);
-*/
+
 
 		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
 
@@ -224,9 +225,88 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	}
 }
+*/
 
 
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+    if(huart -> Instance == USART1) //pc -> mobile
+    {
+			HAL_UART_Transmit(&huart1, &rx1_data, sizeof(rx1_data), 10);
+    		HAL_UART_Transmit(&huart3, &rx1_data, sizeof(rx1_data), 10);
+            HAL_UART_Receive_IT(&huart1, &rx1_data, 1);
+
+    }
+    else if(huart->Instance == USART3) //mobile ->pc
+	{
+
+		//HAL_UART_Transmit(&huart1, "OK", strlen("OK"), 10);
+
+
+
+
+
+    	 if(rx3_data == 'A' || rx3_data == 'B')
+    	 {
+    		 if(rx3_data == 'A')
+    		 {
+    			 hx_flag = 1;
+    		 }
+    		 else if(rx3_data == 'B')
+    		 {
+    			 hx_flag = 2;
+    			 Rx_buffer[Rx_index] = '\0';
+    			 Rx_index=0;
+    			 sugar_weight = atoi(Rx_buffer);
+    			 memset(Rx_buffer,'\0',sizeof(Rx_buffer));
+    		 }
+    	 }
+    	 else if(rx3_data != '\n')
+    	    {
+   		  Rx_buffer[Rx_index++] = rx3_data;
+
+
+    	     }
+
+    	  else
+    	  {
+
+	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+
+	    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
+
+	    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+
+    		 print_flag = 1;
+ 			 Rx_buffer[Rx_index] = '\0';
+ 			 Rx_index=0;
+ 			 salt_weight = atoi(Rx_buffer);
+
+    	      //uart_weight_f = atof(Rx_buffer);
+
+    	  }
+
+
+
+
+        HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
+    	//HAL_UART_Transmit(&huart1, rx3_buffer, strlen(rx3_buffer), 10);
+
+        //startControll(rx3_data);
+        //startControll(rx3_buffer);
+
+
+		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
+
+		//HAL_UART_Receive_IT(&huart3, rx3_buffer, strlen(rx3_buffer));
+
+
+	}
+}
 
 
 
@@ -344,11 +424,52 @@ int main(void)
   while (1)
   {
 
+
 	  weight = Get_Weight()- initial_weight;
 	  weight *= -1;
       HAL_Delay(100);
 
+      //all print
+      //sugar
 
+      if(print_flag == 1)
+      {
+          if((weight >= (float)sugar_weight/15*idx) && print_flag !=0)
+    	  {
+        	  opening(idx,print_flag);
+        	  idx++;
+        	  if(idx > 15)
+        	  {
+        		  initial_weight = Get_Weight();
+        		  //opening(15,hx_flag);
+        		  idx=0;
+        		  hx_flag=0;
+            	  print_flag = 2;
+        	  }
+    	   }
+      }
+      else if (print_flag == 2)
+      {
+          if((weight >= (float)salt_weight/15*idx) && print_flag !=0)
+        	 {
+            	  opening(idx,print_flag);
+            	  idx++;
+            	  if(idx > 15)
+            	  {
+            		  initial_weight = Get_Weight();
+            		  //opening(15,hx_flag);
+            		  idx=0;
+            		  hx_flag=0;
+                	  print_flag = 0;
+
+            	  }
+        	   }
+      }
+
+
+
+// indivisual print
+      /*
       if((weight >= uart_weight_f/15*idx) && hx_flag !=0)
       {
     	  opening(idx,hx_flag);
@@ -363,7 +484,7 @@ int main(void)
     	  }
       }
 
-
+*/
 /*
 
 	  weight_f = Get_Weight_f() - initial_weight_f;

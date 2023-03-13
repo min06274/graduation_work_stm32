@@ -45,6 +45,11 @@ extern int32_t weight;
 extern float weight_f;
 extern float uart_weight_f;
 extern float avg_weight_f;
+
+extern int sugar_weight;
+extern int salt_weight;
+
+extern int print_flag;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
 
@@ -254,11 +259,13 @@ void TIM3_IRQHandler(void)
 */
 	  //digit4_temper((int)(100));
 
+
 	if(weight < 0)
 	{
 		weight = 0;
 	}
 
+	/*
 	if(weight > uart_weight_f)
 	{
 		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
@@ -278,6 +285,43 @@ void TIM3_IRQHandler(void)
 		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 
 	}
+*/
+
+
+	if(print_flag ==2)
+	{
+
+  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+
+  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+
+  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
+
+  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+
+   	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+
+      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+
+	}
+
+	if( print_flag == 0)
+	{
+
+	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+
+	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+
+	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+
+	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+
+	}
+
 
 	digit4_temper(weight*10);
 

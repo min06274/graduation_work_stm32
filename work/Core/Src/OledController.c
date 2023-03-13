@@ -18,11 +18,11 @@ void opening(int idx, int flag)
 
 		SSD1306_GotoXY(0, 0);
 
-		if(flag == 1)
+		if(flag == 2)
 		{
 		SSD1306_Puts("salt ing...", &Font_11x18, 1);
 		}
-		else if(flag == 2)
+		else if(flag == 1)
 		{
 			SSD1306_Puts("sugar ing...", &Font_11x18, 1);
 
@@ -119,11 +119,11 @@ void opening(int idx, int flag)
 
 		SSD1306_GotoXY(0, 0);
 
-		if(flag == 1)
+		if(flag == 2)
 		{
 		SSD1306_Puts("salt end", &Font_11x18, 1);
 		}
-		else if(flag == 2)
+		else if(flag == 1)
 		{
 			SSD1306_Puts("sugar end", &Font_11x18, 1);
 
