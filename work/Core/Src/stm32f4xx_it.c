@@ -276,6 +276,7 @@ void TIM3_IRQHandler(void)
 		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 
 		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+
 	}
 
 	digit4_temper(weight*10);

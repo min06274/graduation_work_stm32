@@ -158,6 +158,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 
+
     	if(uart_cnt == 0)
     	{
     		which = rx3_data;
@@ -171,9 +172,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     	  else
     	  {
+
+
     		  uart_cnt = 0;
     		  if(which == '1')
     		  {
+        	      hx_flag = 1;
+
     	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
     	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
@@ -184,6 +189,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     		  }
     		  else if(which == '2')
     		  {
+        	      hx_flag = 2;
+
        	    	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
 
         	      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
@@ -197,8 +204,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     		  Rx_index = 0;
 
     	      uart_weight_f = atof(Rx_buffer);
-
-    	      hx_flag = 1;
 
     	  }
 
@@ -272,6 +277,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
+  /*
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
 
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
@@ -279,6 +285,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  */
   //step
   /*
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
@@ -342,16 +349,20 @@ int main(void)
       HAL_Delay(100);
 
 
-      if((weight > uart_weight_f/15*idx) && hx_flag ==1)
+      if((weight >= uart_weight_f/15*idx) && hx_flag !=0)
       {
-    	  opening(idx);
+    	  opening(idx,hx_flag);
     	  idx++;
     	  if(idx > 15)
     	  {
+    		  initial_weight = Get_Weight();
+    		  //opening(15,hx_flag);
     		  idx=0;
     		  hx_flag=0;
+
     	  }
       }
+
 
 /*
 

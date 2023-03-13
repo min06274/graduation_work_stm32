@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-void opening(int idx)
+void opening(int idx, int flag)
 {
 
 
@@ -18,7 +18,16 @@ void opening(int idx)
 
 		SSD1306_GotoXY(0, 0);
 
+		if(flag == 1)
+		{
 		SSD1306_Puts("salt ing...", &Font_11x18, 1);
+		}
+		else if(flag == 2)
+		{
+			SSD1306_Puts("sugar ing...", &Font_11x18, 1);
+
+		}
+
 		SSD1306_DrawBitmap(0, 52, logo0, 128, 12, 1);
 		SSD1306_UpdateScreen();
 	case 1:
@@ -110,7 +119,15 @@ void opening(int idx)
 
 		SSD1306_GotoXY(0, 0);
 
+		if(flag == 1)
+		{
 		SSD1306_Puts("salt end", &Font_11x18, 1);
+		}
+		else if(flag == 2)
+		{
+			SSD1306_Puts("sugar end", &Font_11x18, 1);
+
+		}
 		SSD1306_DrawFilledRectangle(0,52,128,12,0);
 
 		SSD1306_DrawBitmap(0, 52, logo15, 128, 12, 1);
@@ -119,7 +136,6 @@ void opening(int idx)
 	}
 
 
-	//printDefault();
 }
 
 
