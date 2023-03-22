@@ -18,7 +18,7 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim12;
 extern TIM_HandleTypeDef htim13;
 extern TIM_HandleTypeDef htim14;
-
+extern int step_flag;
 void micro_delay(uint16_t us) {
 
 	htim9.Instance->CNT = 0;
@@ -61,6 +61,8 @@ void stepStart(int which) {
 		micro_delay(6836);
 
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+		step_flag = 1;
+
 		break;
 
 		//black

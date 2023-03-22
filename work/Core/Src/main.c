@@ -91,6 +91,8 @@ int print_flag = 0;
 int salt_weight = 0;
 int sugar_weight = 0;
 
+int step_flag = 0;
+
 extern userDetails user[10];
 extern int usernumber;
 
@@ -280,9 +282,9 @@ int main(void) {
 	HAL_TIM_Base_Start_IT(&htim3);
 
 	//oled
-	//SSD1306_Init();
+	SSD1306_Init();
 
-	//printDefault();
+	printDefault();
 
 	initial_weight = Get_Weight();
 
@@ -336,7 +338,26 @@ int main(void) {
 			HAL_Delay(100);
 			//all print
 			//sugar
-			if (print_flag == 2) {
+			if (print_flag == 3) {
+						if (usernumber == 0)
+							print_usernumber = 9;
+						else
+							print_usernumber = usernumber - 1;
+						if ((weight_f >= (float) user[print_usernumber].black / 15 * idx)
+								&& print_flag != 0) {
+							opening(idx, print_flag);
+							idx++;
+							if (idx > 15) {
+								initial_weight = Get_Weight();
+								initial_weight_f = Get_Weight_f();
+								//opening(15,hx_flag);
+								idx = 0;
+								hx_flag = 0;
+								print_flag = 0;
+							}
+						}
+					}
+			else if (print_flag == 2) {
 				if (usernumber == 0)
 					print_usernumber = 9;
 				else
@@ -351,7 +372,7 @@ int main(void) {
 						//opening(15,hx_flag);
 						idx = 0;
 						hx_flag = 0;
-						print_flag = 0;
+						print_flag = 3;
 					}
 				}
 			} else if (print_flag == 1) {

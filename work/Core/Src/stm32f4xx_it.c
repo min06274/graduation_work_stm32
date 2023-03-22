@@ -53,7 +53,7 @@ extern float avg_weight_f;
 extern int32_t initial_weight;
 extern int sugar_weight;
 extern int salt_weight;
-
+extern int step_flag;
 extern int print_flag;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
@@ -287,10 +287,16 @@ void TIM3_IRQHandler(void)
 
 
 
+		if(print_flag == 3 && step_flag == 0)
+		{
+			stepStart(BLACK);
+			stepStop(SUGAR);
+
+		}
 		if(print_flag ==2)
 		{
 
-			stepStop(BLACK);
+			stepStop(SALT);
 			stepStart(SUGAR);
 			/*
 	  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
@@ -304,10 +310,14 @@ void TIM3_IRQHandler(void)
 	*/
 		}
 
+		if( print_flag == 1)
+		{
+			stepStart(SALT);
+		}
 		if( print_flag == 0)
 		{
 
-			stepStop(SUGAR);
+			stepStop(ALL);
 			/*
 		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
 		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);

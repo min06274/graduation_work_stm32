@@ -25,10 +25,10 @@
 #include "StepController.h"
 
 
-extern print_flag;
+extern int print_flag;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
-
+extern int step_flag;
 #define wifi_uart &huart1
 #define pc_uart &huart2
 #define maxnumberofusers  10  // Max number of users
@@ -232,7 +232,7 @@ void Server_Start (void)
 
 
 
-		stepStart(BLACK);
+		//stepStart(BLACK);
 		/*
 		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
@@ -243,6 +243,7 @@ void Server_Start (void)
 		HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
 		*/
 		print_flag = 1;
+		step_flag = 0;
 		GetDataFromBuffer("salt=", "&", buftostoreheader, user[usernumber].Salt_weight,&user[usernumber].salt);
 
 		GetDataFromBuffer("sugar=", "&", buftostoreheader, user[usernumber].Sugar_weight,&user[usernumber].sugar);
