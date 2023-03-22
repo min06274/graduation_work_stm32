@@ -22,6 +22,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "StepController.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,7 +32,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define SALT 1
+#define SUGAR 2
+#define BLACK 3
+#define RED 4
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +49,7 @@ extern int32_t weight;
 extern float weight_f;
 extern float uart_weight_f;
 extern float avg_weight_f;
-
+extern int32_t initial_weight;
 extern int sugar_weight;
 extern int salt_weight;
 
@@ -54,7 +58,6 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
 
 extern TIM_HandleTypeDef htim4;
-extern TIM_HandleTypeDef htim1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,7 +74,7 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -235,8 +238,10 @@ void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
 
-
-
+/*
+	  weight = Get_Weight()- initial_weight;
+	  weight *= -1;
+*/
 /*
 
 	if(avg_weight_f<0)
@@ -288,9 +293,13 @@ void TIM3_IRQHandler(void)
 */
 
 
+
 	if(print_flag ==2)
 	{
 
+		stepStop(SALT);
+		stepStart(SUGAR);
+		/*
   	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 
   	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
@@ -306,12 +315,14 @@ void TIM3_IRQHandler(void)
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-
+*/
 	}
 
 	if( print_flag == 0)
 	{
 
+		stepStop(SUGAR);
+		/*
 	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
 
 	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
@@ -319,7 +330,7 @@ void TIM3_IRQHandler(void)
 	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 
 	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-
+*/
 	}
 
 
@@ -338,6 +349,7 @@ void TIM3_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+	Uart_isr(&huart1);
 
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
@@ -347,17 +359,18 @@ void USART1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles USART3 global interrupt.
+  * @brief This function handles USART2 global interrupt.
   */
-void USART3_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-  /* USER CODE BEGIN USART3_IRQn 0 */
+  /* USER CODE BEGIN USART2_IRQn 0 */
+	Uart_isr(&huart2);
 
-  /* USER CODE END USART3_IRQn 0 */
-  HAL_UART_IRQHandler(&huart3);
-  /* USER CODE BEGIN USART3_IRQn 1 */
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
 
-  /* USER CODE END USART3_IRQn 1 */
+  /* USER CODE END USART2_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

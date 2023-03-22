@@ -39,6 +39,7 @@
 #include "StepAngle.h"
 #include <stdlib.h>
 #include "StepController.h"
+#include "ESP_DATA_HANDLER.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -63,7 +64,7 @@ TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim8;
 
 UART_HandleTypeDef huart1;
-UART_HandleTypeDef huart3;
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 int _write(int file,char * p, int len){
@@ -87,15 +88,21 @@ int salt_weight = 0;
 int sugar_weight = 0;
 
 
+extern userDetails user[10];
+extern int usernumber;
+
+int print_usernumber;
+
+/*
 // bluetooth uart
 uint8_t rx3_data;
 uint8_t rx1_data;
 
 char Rx_buffer[100];
-char which;
+
 int Rx_index = 0;
-
-
+char which;
+*/
 
 /* USER CODE END PV */
 
@@ -109,126 +116,21 @@ static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM5_Init(void);
-static void MX_USART3_UART_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/*
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
 
-    if(huart -> Instance == huart1.Instance)
-    {
-    	sprintf(senddata,"%d",weight);
-
-
-    	HAL_UART_Transmit(&huart1, senddata, strlen(senddata), 10);
-
-
-         //HAL_UART_Transmit(&huart1,RxBuffer, strlen(RxBuffer), 10);
-         //HAL_UART_Transmit(&huart1,"\n", strlen("\n"), 10);
-
-        //htim2.Instance->CCR1 = RxBuffer;
-
-
-        HAL_UART_Receive_IT(&huart1, &RxBuffer, 1);
-    }
-}
-*/
-
-
-/*
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-
-    if(huart -> Instance == USART1) //pc -> mobile
-    {
-			HAL_UART_Transmit(&huart1, &rx1_data, sizeof(rx1_data), 10);
-    		HAL_UART_Transmit(&huart3, &rx1_data, sizeof(rx1_data), 10);
-            HAL_UART_Receive_IT(&huart1, &rx1_data, 1);
-
-    }
-    else if(huart->Instance == USART3) //mobile ->pc
-	{
-
-		//HAL_UART_Transmit(&huart1, "OK", strlen("OK"), 10);
-
-
-
-    	if(uart_cnt == 0)
-    	{
-    		which = rx3_data;
-    		uart_cnt++;
-    	}
-    	 else if(rx3_data != '\n')
-    	  {
-
-    		  Rx_buffer[Rx_index++] = rx3_data;
-    	  }
-
-    	  else
-    	  {
-
-
-    		  uart_cnt = 0;
-    		  if(which == '1')
-    		  {
-        	      hx_flag = 1;
-
-    	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-
-    	    	  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-
-    	    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
-
-    	    	  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
-    		  }
-    		  else if(which == '2')
-    		  {
-        	      hx_flag = 2;
-
-       	    	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-
-        	      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-
-        	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-
-        	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-    		  }
-
-    		  Rx_buffer[Rx_index] = '\0';
-    		  Rx_index = 0;
-
-    	      uart_weight_f = atof(Rx_buffer);
-
-    	  }
 
 
 
 
-        HAL_UART_Transmit(&huart1, &rx3_data, sizeof(rx3_data), 10);
-    	//HAL_UART_Transmit(&huart1, rx3_buffer, strlen(rx3_buffer), 10);
-
-        //startControll(rx3_data);
-        //startControll(rx3_buffer);
-
-
-		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
-
-		//HAL_UART_Receive_IT(&huart3, rx3_buffer, strlen(rx3_buffer));
-
-
-	}
-}
-*/
-
-
-
+/*
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
@@ -308,7 +210,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
-
+*/
 
 /* USER CODE END 0 */
 
@@ -351,31 +253,16 @@ int main(void)
   MX_TIM4_Init();
   MX_I2C2_Init();
   MX_TIM5_Init();
-  MX_USART3_UART_Init();
   MX_TIM8_Init();
   MX_TIM1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  ESP_Init("U+NetCB93", "1CEC007537","192.168.123.107");
+
+  //hx711 _msdelay
+  HAL_TIM_Base_Start(&htim5);
 
 
-  /*
-  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-
-  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-  */
-  //step
-  /*
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-
-  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
-
-  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
-*/
 
   //fnd
   init_fnd(&hspi2);
@@ -383,7 +270,27 @@ int main(void)
   //fnd interrupt
   HAL_TIM_Base_Start_IT(&htim3);
 
-  //servo
+
+
+
+
+
+  //oled
+  SSD1306_Init();
+
+
+  printDefault();
+
+
+
+  initial_weight = Get_Weight();
+
+  initial_weight_f = Get_Weight_f();
+
+
+  /*
+
+   //servo
   //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
 
@@ -399,23 +306,12 @@ int main(void)
   //HAL_UART_Receive_IT(&huart3, rx3_buffer, strlen(rx3_buffer));
 
 
-
   //using micro delay for step motor
   //HAL_TIM_Base_Start(&htim4);
 
-  //oled
-  SSD1306_Init();
 
 
-  printDefault();
-
-  //hx711 _msdelay
-  HAL_TIM_Base_Start(&htim5);
-
-
-  initial_weight = Get_Weight();
-
-  initial_weight_f = Get_Weight_f();
+  */
 
   /* USER CODE END 2 */
 
@@ -425,46 +321,71 @@ int main(void)
   {
 
 
-	  weight = Get_Weight()- initial_weight;
-	  weight *= -1;
-      HAL_Delay(100);
 
-      //all print
-      //sugar
+	  	  if(print_flag == 0)
+	  	  {
+	  	  Server_Start();
+	  	  }
 
-      if(print_flag == 1)
-      {
-          if((weight >= (float)sugar_weight/15*idx) && print_flag !=0)
-    	  {
-        	  opening(idx,print_flag);
-        	  idx++;
-        	  if(idx > 15)
-        	  {
-        		  initial_weight = Get_Weight();
-        		  //opening(15,hx_flag);
-        		  idx=0;
-        		  hx_flag=0;
-            	  print_flag = 2;
-        	  }
-    	   }
-      }
-      else if (print_flag == 2)
-      {
-          if((weight >= (float)salt_weight/15*idx) && print_flag !=0)
-        	 {
-            	  opening(idx,print_flag);
-            	  idx++;
-            	  if(idx > 15)
-            	  {
-            		  initial_weight = Get_Weight();
-            		  //opening(15,hx_flag);
-            		  idx=0;
-            		  hx_flag=0;
-                	  print_flag = 0;
+	  	  else
+	  	  {
 
-            	  }
-        	   }
-      }
+
+	  	  weight = Get_Weight()- initial_weight;
+	  	  weight *= -1;
+	        //HAL_Delay(100);
+
+	  	  weight_f = Get_Weight_f()- initial_weight_f;
+	  	  weight_f *= -1;
+	        HAL_Delay(100);
+	        //all print
+	        //sugar
+
+	        if(print_flag == 2)
+	        {
+	      	  if (usernumber ==0) print_usernumber = 9;
+	      	  else print_usernumber = usernumber-1;
+	            if((weight_f >= (float)user[print_usernumber].sugar/15*idx) && print_flag !=0)
+	      	  {
+	          	  opening(idx,print_flag);
+	          	  idx++;
+	          	  if(idx > 15)
+	          	  {
+	          		  initial_weight = Get_Weight();
+
+	          		  initial_weight_f = Get_Weight_f();
+	          		  //opening(15,hx_flag);
+	          		  idx=0;
+	          		  hx_flag=0;
+	              	  print_flag = 0;
+	          	  }
+	      	   }
+	        }
+	        else if (print_flag == 1)
+	        {
+	      	  if (usernumber ==0) print_usernumber = 9;
+	      	  else print_usernumber = usernumber-1;
+	            if((weight_f >= (float)user[usernumber-1].salt/15*idx) && print_flag !=0)
+	          	 {
+	              	  opening(idx,print_flag);
+	              	  idx++;
+	              	  if(idx > 15)
+	              	  {
+	              		  initial_weight = Get_Weight();
+
+	              		  initial_weight_f = Get_Weight_f();
+	              		  //opening(15,hx_flag);
+	              		  idx=0;
+	              		  hx_flag=0;
+	                  	  print_flag = 2;
+
+	              	  }
+	          	   }
+	        }
+
+
+	  	  }
+
 
 
 
@@ -1095,35 +1016,35 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
-  * @brief USART3 Initialization Function
+  * @brief USART2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART3_UART_Init(void)
+static void MX_USART2_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART3_Init 0 */
+  /* USER CODE BEGIN USART2_Init 0 */
 
-  /* USER CODE END USART3_Init 0 */
+  /* USER CODE END USART2_Init 0 */
 
-  /* USER CODE BEGIN USART3_Init 1 */
+  /* USER CODE BEGIN USART2_Init 1 */
 
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 9600;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART3_Init 2 */
+  /* USER CODE BEGIN USART2_Init 2 */
 
-  /* USER CODE END USART3_Init 2 */
+  /* USER CODE END USART2_Init 2 */
 
 }
 

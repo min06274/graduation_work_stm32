@@ -8,7 +8,8 @@
 
 #ifndef INC_STEPCONTROLLER_H_
 #define INC_STEPCONTROLLER_H_
-
+void stepStart(int which);
+void stepStop(int which);
 
 
 #endif /* INC_STEPCONTROLLER_H_ */
