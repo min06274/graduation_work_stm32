@@ -16,12 +16,13 @@ extern TIM_HandleTypeDef htim4;
 
 #define stepsperrev 4096
 
+/*
 void micro_delay(uint16_t us)
 {
    __HAL_TIM_SET_COUNTER(&htim4,0);
    while(__HAL_TIM_GET_COUNTER(&htim4) < us);
 }
-
+*/
 void stepper_set_rpm(int rpm)
 {
    micro_delay(60000000/stepsperrev/rpm);

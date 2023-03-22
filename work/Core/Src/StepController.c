@@ -6,11 +6,28 @@
  */
 
 #include "StepController.h"
+
+extern TIM_HandleTypeDef htim9;
+
+
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
 
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim1;
+
+extern TIM_HandleTypeDef htim12;
+extern TIM_HandleTypeDef htim13;
+extern TIM_HandleTypeDef htim14;
+
+
+void micro_delay(uint16_t us)
+{
+
+	htim9.Instance->CNT = 0;
+	while(htim9.Instance->CNT <= us);
+}
+
 
 void stepStart(int which) {
 
@@ -37,6 +54,20 @@ void stepStart(int which) {
 		HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 
 		HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+		break;
+
+	case 3:
+		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
+
+		micro_delay(3418);
+		HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);
+
+		micro_delay(6836);
+
+		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+		break;
+
 		//black
 
 	}
@@ -66,6 +97,20 @@ void stepStop(int which){
 		HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
 
 		HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+		break;
 		//black
+
+	case 3:
+
+		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
+
+		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_2);
+
+		HAL_TIM_PWM_Stop(&htim13, TIM_CHANNEL_1);
+
+		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);
+
+		break;
+
 	}
 }
