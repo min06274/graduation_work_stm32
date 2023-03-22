@@ -36,6 +36,7 @@
 #define SUGAR 2
 #define BLACK 3
 #define RED 4
+#define ALL 5
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -266,75 +267,57 @@ void TIM3_IRQHandler(void)
 
 
 	if(weight < 0)
-	{
-		weight = 0;
-	}
+		{
+			weight = 0;
+		}
 
-	/*
-	if(weight > uart_weight_f)
-	{
-		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
-
-		  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
-
-		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
-
-		  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
-
-		  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-
-		  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-
-		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-
-		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-
-	}
-*/
-
-
-
-	if(print_flag ==2)
-	{
-
-		stepStop(SALT);
-		stepStart(SUGAR);
 		/*
-  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
-
-  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
-
-  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
-
-  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
-
-   	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-
-      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-
-      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-
-      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-*/
-	}
-
-	if( print_flag == 0)
-	{
-
-		stepStop(SUGAR);
-		/*
-	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-
-	      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-
-	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-
-	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-*/
-	}
+		if(weight > uart_weight_f)
+		{
+			  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+			  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+			  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
+			  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+			  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+			  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+			  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+			  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+		}
+	*/
 
 
-	digit4_temper((int)weight_f*10);
+
+		if(print_flag ==2)
+		{
+
+			stepStop(BLACK);
+			stepStart(SUGAR);
+			/*
+	  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+	  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+	  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
+	  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
+	   	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+	      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+	*/
+		}
+
+		if( print_flag == 0)
+		{
+
+			stepStop(SUGAR);
+			/*
+		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+		      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+		      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+	*/
+		}
+
+
+		digit4_temper((int)weight_f*10);
 
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);

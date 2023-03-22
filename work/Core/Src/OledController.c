@@ -35,6 +35,15 @@ void opening(int idx, int flag) {
 			strcat(weight_str_sugar, temp_sugar);
 			SSD1306_Puts(weight_str_sugar, &Font_11x18, 1);
 		}
+		else if (flag == 3) {
+					char weight_str_black[100] = "black ";
+					char temp_black[10]="";
+
+					sprintf(temp_black, "%d", user[print_usernumber].black);
+
+					strcat(weight_str_black, temp_black);
+					SSD1306_Puts(weight_str_black, &Font_11x18, 1);
+				}
 
 		SSD1306_DrawBitmap(0, 52, logo0, 128, 12, 1);
 		SSD1306_UpdateScreen();
@@ -129,6 +138,9 @@ void opening(int idx, int flag) {
 			SSD1306_Puts("salt end", &Font_11x18, 1);
 		} else if (flag == 2) {
 			SSD1306_Puts("sugar end", &Font_11x18, 1);
+
+		}else if (flag == 3) {
+			SSD1306_Puts("black end", &Font_11x18, 1);
 
 		}
 		SSD1306_DrawFilledRectangle(0, 52, 128, 12, 0);

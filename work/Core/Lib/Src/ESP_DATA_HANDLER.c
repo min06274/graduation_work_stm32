@@ -232,7 +232,7 @@ void Server_Start (void)
 
 
 
-		stepStart(SALT);
+		stepStart(BLACK);
 		/*
 		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
