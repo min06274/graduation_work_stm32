@@ -339,6 +339,7 @@ int main(void) {
 			//all print
 			//sugar
 			if (print_flag == 3) {
+
 						if (usernumber == 0)
 							print_usernumber = 9;
 						else
