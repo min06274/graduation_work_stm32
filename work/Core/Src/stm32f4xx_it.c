@@ -314,10 +314,10 @@ void TIM3_IRQHandler(void)
 		{
 			stepStart(SALT);
 		}
-		if( print_flag == 0)
+		if( print_flag == 0 && step_flag == 0)
 		{
 
-			stepStop(ALL);
+			stepStop(BLACK);
 			/*
 		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
 		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);

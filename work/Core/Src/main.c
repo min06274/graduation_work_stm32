@@ -268,7 +268,9 @@ int main(void) {
 
 	//black step(3) micro delay
 	HAL_TIM_Base_Start(&htim9);
-	//stepStart(3);
+
+
+
 
 	ESP_Init("U+NetCB93", "1CEC007537", "192.168.123.107");
 
@@ -327,6 +329,7 @@ int main(void) {
 		 HAL_Delay(100);
 		 */
 
+
 		if (print_flag == 0) {
 			Server_Start();
 		} else {
@@ -355,6 +358,7 @@ int main(void) {
 								idx = 0;
 								hx_flag = 0;
 								print_flag = 0;
+								step_flag =0;
 							}
 						}
 					}
@@ -396,6 +400,7 @@ int main(void) {
 				}
 			}
 		}
+
 
 // indivisual print
 		/*

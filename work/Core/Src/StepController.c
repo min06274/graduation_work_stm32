@@ -102,37 +102,18 @@ void stepStop(int which) {
 
 		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_2);
 
-		HAL_TIM_PWM_Stop(&htim13, TIM_CHANNEL_1);
-
-		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);
-
-		break;
-
-	case 5:
-		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-
-		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-
-		HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-
-		HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
-
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
-
-		HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
-
-		HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
-
-		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_1);
-
-		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_2);
+		micro_delay(3418);
 
 		HAL_TIM_PWM_Stop(&htim13, TIM_CHANNEL_1);
 
+		micro_delay(6836);
+
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);
 
+		step_flag = 1;
+
 		break;
+
+
 	}
 }
