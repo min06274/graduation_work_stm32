@@ -265,12 +265,12 @@ void TIM3_IRQHandler(void)
 */
 	  //digit4_temper((int)(100));
 
-
+/*
 	if(weight < 0)
 		{
 			weight = 0;
 		}
-
+*/
 		/*
 		if(weight > uart_weight_f)
 		{
@@ -286,7 +286,7 @@ void TIM3_IRQHandler(void)
 	*/
 
 
-
+/*
 		if(print_flag == 3 && step_flag == 0)
 		{
 			stepStart(BLACK);
@@ -298,16 +298,7 @@ void TIM3_IRQHandler(void)
 
 			stepStop(SALT);
 			stepStart(SUGAR);
-			/*
-	  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
-	  	  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
-	  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_1);
-	  	  HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_2);
-	   	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-	      HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-	      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-	*/
+
 		}
 
 		if( print_flag == 1)
@@ -318,15 +309,10 @@ void TIM3_IRQHandler(void)
 		{
 
 			stepStop(BLACK);
-			/*
-		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-		      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-		      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
-		      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
-	*/
+
 		}
 
-
+*/
 		digit4_temper((int)weight_f*10);
 
   /* USER CODE END TIM3_IRQn 0 */

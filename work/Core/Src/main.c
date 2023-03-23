@@ -44,6 +44,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SALT 1
+#define SUGAR 2
+#define BLACK 3
+#define RED 4
+#define ALL 5
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -332,17 +337,26 @@ int main(void) {
 
 		if (print_flag == 0) {
 			Server_Start();
-		} else {
+
+		}
+
+
+		else {
 			weight = Get_Weight() - initial_weight;
 			weight *= -1;
-			//HAL_Delay(100);
 			weight_f = Get_Weight_f() - initial_weight_f;
 			weight_f *= -1;
 			HAL_Delay(100);
+
+
 			//all print
 			//sugar
 			if (print_flag == 3) {
-
+				if(step_flag == 0)
+					{
+					stepStop(SUGAR);
+					stepStart(BLACK);
+					}
 						if (usernumber == 0)
 							print_usernumber = 9;
 						else
@@ -359,10 +373,16 @@ int main(void) {
 								hx_flag = 0;
 								print_flag = 0;
 								step_flag =0;
+								stepStop(BLACK); // after pwm4, change
 							}
 						}
 					}
 			else if (print_flag == 2) {
+				if(step_flag == 0)
+					{
+					stepStop(SALT);
+					stepStart(SUGAR);
+					}
 				if (usernumber == 0)
 					print_usernumber = 9;
 				else
@@ -378,9 +398,15 @@ int main(void) {
 						idx = 0;
 						hx_flag = 0;
 						print_flag = 3;
+						step_flag = 0;
+
 					}
 				}
-			} else if (print_flag == 1) {
+			} else if (print_flag == 1 ) {
+				if(step_flag == 0)
+				{
+				stepStart(SALT);
+				}
 				if (usernumber == 0)
 					print_usernumber = 9;
 				else
@@ -396,6 +422,7 @@ int main(void) {
 						idx = 0;
 						hx_flag = 0;
 						print_flag = 2;
+						step_flag = 0;
 					}
 				}
 			}

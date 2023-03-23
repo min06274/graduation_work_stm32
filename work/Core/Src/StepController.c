@@ -61,13 +61,13 @@ void stepStart(int which) {
 		micro_delay(6836);
 
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
-		step_flag = 1;
 
 		break;
 
 		//black
 
 	}
+	step_flag = 1;
 }
 
 void stepStop(int which) {
@@ -110,10 +110,11 @@ void stepStop(int which) {
 
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);
 
-		step_flag = 1;
 
 		break;
 
 
 	}
+
+
 }
