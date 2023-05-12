@@ -24,7 +24,7 @@
 #include "string.h"
 #include "StepController.h"
 
-
+extern int experiment_flag;
 extern int print_flag;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
@@ -50,24 +50,28 @@ int sizeofuser (userDetails *user)
 
 char *home = "<!DOCTYPE html>\n\
 		<html>\n\
-		<body>\n\
-		<h1>ESP8266 USER DATA COLLECTION</h1>\n\
-		<p>Enter the Details in the form below: </p>\n\
+		<body style=\"margin-right: 20px\">\n\
+		<h1>Serial Data</h1>\n\
+		<div>\n\
+		<img src = \"https://user-images.githubusercontent.com/63834998/231028427-4ec4bd3b-514b-43ae-8777-5b59c36a44eb.png\" style = \"float: left; margin-right: 20px\">\n\
 		<form action=\"/page1\">\n\
-		<label for=\"salt\">Salt:</label><br>\n\
+		<label style=\"font-size: 30px; color: #00FF00\" for=\"salt\">Carbohydrate</label><br>\n\
 		<input type=\"number\" id=\"salt\" name=\"salt\" value=\"\"><br><br>\n\
-		<label for=\"sugar\">Sugar:</label><br>\n\
+		<label style=\"font-size: 30px; color: #FF0000\" for=\"sugar\">Protein</label><br>\n\
 		<input type=\"number\" id=\"sugar\" name=\"sugar\" value=\"\"><br><br>\n\
-		<label for=\"blackpepper\">BlackPepper:</label><br>\n\
+		<label style=\"font-size: 30px; color: #A52A2A\" for=\"blackpepper\">Fat</label><br>\n\
 		<input type=\"number\" id=\"blackpepper\" name=\"blackpepper\" value=\"\"><br><br>\n\
-		<label for=\"Redpepper\">RedPepper:</label><br>\n\
-		<input type=\"number\" id=\"redpepper\" name=\"redpepper\" value=\"\"><br><br>\n\
 		<input type=\"submit\" value=\"Submit\">\n\
 		</form><br><br>\n\
 		<form action=\"/page2\">\n\
 		<input type=\"submit\" value=\"View Data\">\n\
 		</form>\n\
+		</div>\n\
 		</body></html>";
+
+
+
+
 
 char *page1 = "<!DOCTYPE html>\n\
 		<html>\n\
@@ -82,6 +86,8 @@ char *page1 = "<!DOCTYPE html>\n\
 		<input type=\"submit\" value=\"View Data\">\n\
 		</form>\n\
 		</body></html>";
+
+
 
 char *page2_Top = "<!DOCTYPE html>\n\
 		<html>\n\
@@ -98,7 +104,7 @@ char *table = "<style>table {  font-family: arial, sans-serif;\
 		border-collapse: collapse;  width: 50%;}\
 		td, th {  border: 1px solid #dddddd;\
 		text-align: left;  padding: 8px;}tr:nth-child(even)\
-		{  background-color: #dddddd;}</style><table><tr><th>Salt</th><th>Sugar</th><th>BlackPepper</th><th>RedPepper</th></tr>";
+		{  background-color: #dddddd;}</style><table><tr><th>Carbohydrate</th><th>Protein</th><th>Fat</th></tr>";
 
 
 /*****************************************************************************************************************************************/
@@ -187,6 +193,8 @@ int Server_Send (char *str, int Link_ID)
 	return 1;
 }
 
+
+
 void Server_Handle (char *str, int Link_ID)
 {
 	char datatosend[4096] = {0};
@@ -204,7 +212,7 @@ void Server_Handle (char *str, int Link_ID)
 		int bufsize = (sizeofuser (user));
 		for (int i=0; i<bufsize; i++)
 		{
-			sprintf (localbuf, "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",user[i].Salt_weight,user[i].Sugar_weight,user[i].BlackPepper_weight, user[i].RedPepper_weight);
+			sprintf (localbuf, "<tr><td>%s</td><td>%s</td><td>%s</td></tr>",user[i].Salt_weight,user[i].Sugar_weight,user[i].BlackPepper_weight);
 			strcat (datatosend, localbuf);
 		}
 		strcat (datatosend, "</table>");
@@ -219,6 +227,8 @@ void Server_Handle (char *str, int Link_ID)
 
 }
 
+
+
 void Server_Start (void)
 {
 	char buftostoreheader[128] = {0};
@@ -227,11 +237,12 @@ void Server_Start (void)
 
 	Link_ID -= 48;
 	while (!(Copy_upto(" HTTP/1.1", buftostoreheader, wifi_uart)));
+
 	if (Look_for("/page1", buftostoreheader) == 1)
 	{
 
 
-
+		experiment_flag = 1;
 		//stepStart(BLACK);
 		/*
 		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
@@ -247,8 +258,11 @@ void Server_Start (void)
 		GetDataFromBuffer("salt=", "&", buftostoreheader, user[usernumber].Salt_weight,&user[usernumber].salt);
 
 		GetDataFromBuffer("sugar=", "&", buftostoreheader, user[usernumber].Sugar_weight,&user[usernumber].sugar);
-		GetDataFromBuffer("blackpepper=", "&", buftostoreheader, user[usernumber].BlackPepper_weight,&user[usernumber].black);
-		GetDataFromBuffer("redpepper=", " HTTP", buftostoreheader, user[usernumber].RedPepper_weight,&user[usernumber].red);
+		GetDataFromBuffer("blackpepper=", " HTTP", buftostoreheader, user[usernumber].BlackPepper_weight,&user[usernumber].black);
+
+		//GetDataFromBuffer("blackpepper=", "&", buftostoreheader, user[usernumber].BlackPepper_weight,&user[usernumber].black);
+
+		//GetDataFromBuffer("redpepper=", " HTTP", buftostoreheader, user[usernumber].RedPepper_weight,&user[usernumber].red);
 		usernumber++;
 		if (usernumber >9) usernumber = 0;
 		Server_Handle("/page1",Link_ID);

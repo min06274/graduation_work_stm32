@@ -46,6 +46,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+
 extern int32_t weight;
 extern float weight_f;
 extern float uart_weight_f;
@@ -55,9 +56,11 @@ extern int sugar_weight;
 extern int salt_weight;
 extern int step_flag;
 extern int print_flag;
+extern int polar_flag;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
-
+extern uint16_t ttteee1;
+extern uint16_t ttteee2;
 extern TIM_HandleTypeDef htim4;
 /* USER CODE END PV */
 
@@ -74,6 +77,7 @@ extern TIM_HandleTypeDef htim4;
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim6;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
@@ -350,6 +354,41 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 1 */
 
   /* USER CODE END USART2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM6 global interrupt, DAC1 and DAC2 underrun error interrupts.
+  */
+void TIM6_DAC_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+/*
+	if(polar_flag == 0)
+	{
+		TIM1->CCER |= TIM_CCER_CC1P;
+		TIM1->CCER |= TIM_CCER_CC2P;
+		polar_flag = 1;
+	}
+	else
+	{
+		TIM1->CCER = ttteee1;
+		TIM1->CCER = ttteee2;
+		polar_flag = 0;
+
+
+	}
+
+*/
+	TIM1->CCER |= TIM_CCER_CC1P;
+	TIM1->CCER |= TIM_CCER_CC2P;
+	//polar_flag +=100;
+	//TIM1->CCER = ttteee1;
+	//TIM1->CCER = ttteee2;
+  /* USER CODE END TIM6_DAC_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim6);
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+
+  /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

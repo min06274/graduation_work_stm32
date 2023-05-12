@@ -31,8 +31,7 @@ typedef struct
 	int sugar;
 	char BlackPepper_weight[5];
 	int black;
-	char RedPepper_weight[5];
-	int red;
+
 }userDetails;
 
 

@@ -17,7 +17,7 @@ void opening(int idx, int flag) {
 		SSD1306_GotoXY(0, 0);
 
 		if (flag == 1) {
-			char weight_str_salt[100] = "salt ";
+			char weight_str_salt[100] = "carboh ";
 			char temp_salt[10]="";
 
 			sprintf(temp_salt, "%d", user[print_usernumber].salt);
@@ -27,7 +27,7 @@ void opening(int idx, int flag) {
 
 
 		} else if (flag == 2) {
-			char weight_str_sugar[100] = "sugar ";
+			char weight_str_sugar[100] = "protein ";
 			char temp_sugar[10]="";
 
 			sprintf(temp_sugar, "%d", user[print_usernumber].sugar);
@@ -36,7 +36,7 @@ void opening(int idx, int flag) {
 			SSD1306_Puts(weight_str_sugar, &Font_11x18, 1);
 		}
 		else if (flag == 3) {
-					char weight_str_black[100] = "black ";
+					char weight_str_black[100] = "fat ";
 					char temp_black[10]="";
 
 					sprintf(temp_black, "%d", user[print_usernumber].black);
@@ -135,12 +135,12 @@ void opening(int idx, int flag) {
 		SSD1306_GotoXY(0, 0);
 
 		if (flag == 1) {
-			SSD1306_Puts("salt end", &Font_11x18, 1);
+			SSD1306_Puts("carboh end", &Font_11x18, 1);
 		} else if (flag == 2) {
-			SSD1306_Puts("sugar end", &Font_11x18, 1);
+			SSD1306_Puts("protein end", &Font_11x18, 1);
 
 		}else if (flag == 3) {
-			SSD1306_Puts("black end", &Font_11x18, 1);
+			SSD1306_Puts("All end", &Font_11x18, 1);
 
 		}
 		SSD1306_DrawFilledRectangle(0, 52, 128, 12, 0);
@@ -148,6 +148,7 @@ void opening(int idx, int flag) {
 		SSD1306_DrawBitmap(0, 52, logo15, 128, 12, 1);
 		SSD1306_UpdateScreen();
 		break;
+
 	}
 
 }
@@ -160,7 +161,7 @@ void printDefault() {
 	SSD1306_GotoXY(0, 15);
 	SSD1306_Puts("---------", &Font_11x18, 1);
 	SSD1306_GotoXY(14, 38);
-	SSD1306_Puts("seasoning!", &Font_11x18, 1);
+	SSD1306_Puts("cereal!", &Font_11x18, 1);
 
 	SSD1306_UpdateScreen();
 

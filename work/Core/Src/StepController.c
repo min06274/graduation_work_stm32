@@ -55,17 +55,33 @@ void stepStart(int which) {
 		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
 
-		micro_delay(3418);
+		micro_delay(9765);
 		HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);
 
-		micro_delay(6836);
+		micro_delay(19531);
 
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
 
 		break;
 
 		//black
+		/*
+	case 3:
+		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 
+		micro_delay(6836);
+		HAL_TIM_PWM_Start(&htim13, TIM_CHANNEL_1);
+		micro_delay(6836);
+
+		HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
+
+
+		micro_delay(6836);
+
+		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+
+		break;
+		*/
 	}
 	step_flag = 1;
 }
@@ -102,11 +118,11 @@ void stepStop(int which) {
 
 		HAL_TIM_PWM_Stop(&htim12, TIM_CHANNEL_2);
 
-		micro_delay(3418);
+		micro_delay(9765);
 
 		HAL_TIM_PWM_Stop(&htim13, TIM_CHANNEL_1);
 
-		micro_delay(6836);
+		micro_delay(19531);
 
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);
 
