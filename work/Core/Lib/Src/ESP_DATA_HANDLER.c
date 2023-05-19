@@ -228,6 +228,13 @@ void Server_Handle (char *str, int Link_ID)
 }
 
 
+void Server_default(void)
+{
+	user[0].salt = 5;
+	user[0].sugar = 5;
+	user[0].black = 5;
+
+}
 
 void Server_Start (void)
 {
@@ -260,9 +267,6 @@ void Server_Start (void)
 		GetDataFromBuffer("sugar=", "&", buftostoreheader, user[usernumber].Sugar_weight,&user[usernumber].sugar);
 		GetDataFromBuffer("blackpepper=", " HTTP", buftostoreheader, user[usernumber].BlackPepper_weight,&user[usernumber].black);
 
-		//GetDataFromBuffer("blackpepper=", "&", buftostoreheader, user[usernumber].BlackPepper_weight,&user[usernumber].black);
-
-		//GetDataFromBuffer("redpepper=", " HTTP", buftostoreheader, user[usernumber].RedPepper_weight,&user[usernumber].red);
 		usernumber++;
 		if (usernumber >9) usernumber = 0;
 		Server_Handle("/page1",Link_ID);

@@ -319,22 +319,28 @@ int main(void)
 	//ESP_Init("U+NetCB93", "1CEC007537", "192.168.123.107");
 
 
+	//ESP_Init("TP-Link_A3B2", "60939388", "192.168.0.105");
 
-	ESP_Init("TP-Link_A3B2", "60939388", "192.168.0.103");
+
+	//ESP_Init("escode", "2023escode", "192.168.0.106");
+
+	//ESP_Init("INU-wireless", "98062729", "10.92.0.103");
+
+	ESP_Init("embest", "2023embest", "192.168.0.125");
 
 
 	//hx711 _msdelay
-	//HAL_TIM_Base_Start(&htim5);
+	HAL_TIM_Base_Start(&htim5);
 
 	//fnd
-	//init_fnd(&hspi2);
+	init_fnd(&hspi2);
 
 	//fnd interrupt
-	//HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_Base_Start_IT(&htim3);
 
 
 	//oled
-	/*
+
 	SSD1306_Init();
 
 	printDefault();
@@ -342,14 +348,21 @@ int main(void)
 	initial_weight = Get_Weight();
 
 	initial_weight_f = Get_Weight_f();
-*/
 
 
+	//print_flag = 1;
+
+	//usernumber = 1;
+	//Server_default();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+
+
+
+
 /*
 		HAL_Delay(10000);
 
@@ -363,10 +376,10 @@ int main(void)
 		TIM1->CCER &= 0xFFFB;
 */
 
-		Server_Start();
+		//Server_Start();
 
 
-/*
+
 		if (print_flag == 0) {
 			Server_Start();
 
@@ -386,8 +399,7 @@ int main(void)
 			if (print_flag == 3) {
 				if(step_flag == 0)
 					{
-					stepStop(SUGAR);
-					stepStart(BLACK);
+					stepStart(SUGAR);
 					opening(0, print_flag);
 
 					}
@@ -400,24 +412,25 @@ int main(void)
 							opening(idx, print_flag);
 							idx++;
 							if (idx > 15) {
-								initial_weight = Get_Weight();
-								initial_weight_f = Get_Weight_f();
+
+								stepStop(SUGAR); // after pwm4, change
+								//initial_weight_f = Get_Weight_f();
 								//opening(15,hx_flag);
 								idx = 0;
 								hx_flag = 0;
 								print_flag = 0;
 								step_flag =0;
-								stepStop(BLACK); // after pwm4, change
 								weight_f = 0;
-								HAL_Delay(2000);
+								HAL_Delay(3000);
+								initial_weight_f = Get_Weight_f();
+
 							}
 						}
 					}
 			else if (print_flag == 2) {
 				if(step_flag == 0)
 					{
-					stepStop(SALT);
-					stepStart(SUGAR);
+					stepStart(BLACK);
 					opening(0, print_flag);
 
 					}
@@ -430,12 +443,17 @@ int main(void)
 					opening(idx, print_flag);
 					idx++;
 					if (idx > 15) {
-						initial_weight = Get_Weight();
-						initial_weight_f = Get_Weight_f();
+
+						weight_f = 0;
+						stepStop(BLACK);
+
+						//initial_weight_f = Get_Weight_f();
 						//opening(15,hx_flag);
 						idx = 0;
 						hx_flag = 0;
-						HAL_Delay(2000);
+						HAL_Delay(3000);
+						initial_weight_f = Get_Weight_f();
+
 						print_flag = 3;
 						step_flag = 0;
 
@@ -457,19 +475,24 @@ int main(void)
 					opening(idx, print_flag);
 					idx++;
 					if (idx > 15) {
-						initial_weight = Get_Weight();
-						initial_weight_f = Get_Weight_f();
+						weight_f = 0;
+						//initial_weight_f = Get_Weight_f();
 						//opening(15,hx_flag);
 						idx = 0;
 						hx_flag = 0;
-						HAL_Delay(2000);
+						stepStop(SALT);
+
+						HAL_Delay(3000);
+						initial_weight_f = Get_Weight_f();
+
 						print_flag = 2;
 						step_flag = 0;
 					}
 				}
 			}
 		}
-*/
+
+
 
 // indivisual print
 		/*
@@ -674,7 +697,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 3125-1;
+  htim1.Init.Prescaler = 1094-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 9999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -759,7 +782,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 3125-1;
+  htim2.Init.Prescaler = 1094-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -878,7 +901,7 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 3125-1;
+  htim4.Init.Prescaler = 1094-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 1000-1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1037,7 +1060,7 @@ static void MX_TIM8_Init(void)
 
   /* USER CODE END TIM8_Init 1 */
   htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 3125-1;
+  htim8.Init.Prescaler = 1094-1;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim8.Init.Period = 9999;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1159,7 +1182,7 @@ static void MX_TIM12_Init(void)
 
   /* USER CODE END TIM12_Init 1 */
   htim12.Instance = TIM12;
-  htim12.Init.Prescaler = 3125-1;
+  htim12.Init.Prescaler = 1094-1;
   htim12.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim12.Init.Period = 1000-1;
   htim12.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1215,7 +1238,7 @@ static void MX_TIM13_Init(void)
 
   /* USER CODE END TIM13_Init 1 */
   htim13.Instance = TIM13;
-  htim13.Init.Prescaler = 3125-1;
+  htim13.Init.Prescaler = 1094-1;
   htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim13.Init.Period = 1000-1;
   htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1261,7 +1284,7 @@ static void MX_TIM14_Init(void)
 
   /* USER CODE END TIM14_Init 1 */
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 3125-1;
+  htim14.Init.Prescaler = 1094-1;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim14.Init.Period = 1000-1;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

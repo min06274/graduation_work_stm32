@@ -23,6 +23,8 @@
 void ESP_Init (char *SSID, char *PASSWD, char *STAIP);
 void Server_Start (void);
 
+void Server_default(void);
+
 typedef struct
 {
 	char Salt_weight[5];
