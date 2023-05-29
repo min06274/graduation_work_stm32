@@ -341,6 +341,7 @@ int main(void)
 
 	//oled
 
+
 	SSD1306_Init();
 
 	printDefault();
@@ -387,6 +388,9 @@ int main(void)
 
 
 		else {
+
+			//?��?�� �???���??
+
 			weight = Get_Weight() - initial_weight;
 			weight *= -1;
 			weight_f = Get_Weight_f() - initial_weight_f;
@@ -397,6 +401,12 @@ int main(void)
 			//all print
 			//sugar
 			if (print_flag == 3) {
+				if(user[usernumber - 1].black == 0)
+								{
+									print_flag = 0;
+									continue;
+
+								}
 				if(step_flag == 0)
 					{
 					stepStart(SUGAR);
@@ -428,6 +438,13 @@ int main(void)
 						}
 					}
 			else if (print_flag == 2) {
+				if(user[usernumber - 1].sugar == 0)
+								{
+									print_flag = 3;
+									continue;
+
+
+								}
 				if(step_flag == 0)
 					{
 					stepStart(BLACK);
@@ -460,6 +477,12 @@ int main(void)
 					}
 				}
 			} else if (print_flag == 1 ) {
+				if(user[usernumber - 1].salt == 0)
+				{
+					print_flag = 2;
+					continue;
+
+				}
 				if(step_flag == 0)
 				{
 				stepStart(SALT);
